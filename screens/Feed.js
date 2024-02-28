@@ -62,7 +62,7 @@ export default function Feed(props) {
                             </Text>}
                         styles= {buttonStyles.buttonDesign}
                         onPress={() => 
-                            props.navigation.navigate(item.page)}
+                            props.navigation.navigate(item.name)}
                     />} 
             />
         </View>

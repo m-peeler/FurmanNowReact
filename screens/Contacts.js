@@ -7,11 +7,13 @@ import arrayPartition from "../utilities/ArrayFunctions";
 import ButtonList from "../components/ButtonList";
 import useDataLoadFetchCache from "../hooks/useDataLoadFetchCache";
 import * as NativeContact from "expo-contacts";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Sets the priorityLevel threshold at which a button will 
 // recieve the emergency coloration and be placed on the 
 // emergency list at the top.
 const emergencyThreshold = 30;
+const fupoPriorityID = 99;
 
 function formatPhoneNumber(phone) {
     if (phone.length != 10) {
@@ -30,11 +32,16 @@ export default function Contacts({navigation, pages}) {
 
     const processContactsResponse = async (resp) => {
         const parse = await resp.json();
-        const partitioned = arrayPartition(parse["results"], ((item) => {return item["priorityLevel"] >= emergencyThreshold}));
+        const partitioned = arrayPartition(parse["results"], ((item) => {return item["priorityLevel"] >= fupoPriorityID}));
         const data = [{key: true,
                        value: partitioned["true"]},
                       {key: false,
                        value: partitioned["false"]}]
+        console.log("HOWDY THERE");
+        console.log(data[0])
+        console.log(data[0].value)
+        console.log(data[0].value[0]);
+    
         return data;
     }
 
@@ -44,54 +51,47 @@ export default function Contacts({navigation, pages}) {
             "DATA:Contacts-Cache", 
             processContactsResponse);
 
-    const renderItem = ({item}) => {  
-
+    function renderItem ({item}) {  
         const emergency = item.priorityLevel >= emergencyThreshold;
         const unpressedText = emergency ? colors.emergencyText : colors.text;
         const unpressedButton = emergency ? colors.emergency : colors.card;
 
-        const styles = {
-            button: {
-                backgroundColor: (pressed) => 
-                    pressed ?
-                        colors.notification : 
-                        unpressedButton,
-                color: (pressed) => 
-                    pressed ? 
-                        colors.notificationText : 
-                        unpressedText,
-                borderRadius: 5,
-                margin: 2
+        const styles = (pressed) => {
+            return {
+                front: {
+                    backgroundColor:  
+                        pressed ?
+                            colors.notification : 
+                            unpressedButton,
+                    color: 
+                        pressed ? 
+                            colors.notificationText : 
+                            unpressedText,
+                    borderRadius: 5,
+                    margin: 2,
+                    numberText: fonts.regular,
+                    numberSize: 18,
+                    nameText: fonts.bold,
+                    nameSize: 24
+                },
+                button: {
+                    backgroundColor: 
+                        pressed ?
+                            colors.notification : 
+                            unpressedButton,
+                    color:
+                        pressed ? 
+                            colors.notificationText : 
+                            unpressedText,
+                    borderRadius: 8
+                }
             }
-        }
-
-        const renderFront = (item) => (pressed) => {
-            return (
-                <View style={{paddingVertical: 3, paddingHorizontal: 10}}>
-                    <Text style={ 
-                                {fontFamily: fonts.bold,
-                                fontSize: 20,
-                                color: styles.button.color(pressed)}}>
-                        {item.name} 
-                    </Text>
-                    <View style={{alignContent: "center", 
-                            marginTop: 5,
-                            marginLeft: 10}}>
-                        <Text style={
-                                        {fontFamily: fonts.regular,
-                                        fontSize: 15,
-                                        color: styles.button.color(pressed)}
-                                    }>
-                            {formatPhoneNumber(item.number)}
-                        </Text>
-                    </View>
-                </View>)
         }
         
         return (
             <Button
                 onLongPress={(() => requestAddAlert(item))}
-                delayLongPress={1000}
+                delayLongPress={650}
                 onPress={()=>{Linking.openURL(`tel:${item.number}`);}}
                 styles={styles}
                 accessibilityLabel={item.name}
@@ -109,7 +109,13 @@ export default function Contacts({navigation, pages}) {
             marginHorizontal: 20,
             marginVertical: 5,
             marginBottom: 10,
-            padding: 5
+            padding: 5,
+            alignSelf: "center",
+            position: "absolute",
+            top: 85,
+            width: "95%",
+            height: Dimensions.get("window").height - 85 - 30 - headerHeight,
+            flexGrow: 10
         },
         loadingText: {
             fontFamily: fonts.bold, 
@@ -125,11 +131,15 @@ export default function Contacts({navigation, pages}) {
             ...normalStyle.bounding,
             marginBottom: 5,
             marginTop: 10,
+            top: 0,
+            height: "auto",
+            width: "95%",
+            flex: 1,
+            flexGrow: 1,
+            position: "absolute"
         },
         scrollEnabled: false,
     };
-
-    console.log(headerHeight);
 
     return (
         // What seems to be happening here is that FlatList is a bit
@@ -146,19 +156,24 @@ export default function Contacts({navigation, pages}) {
                 </View>
             }
             {(!fetching || !loading) && 
-                data.map(({key, value}) =>
+               data &&
+                <SafeAreaView>
+                    <View style={emergencyStyle.bounding}>
+                        {renderItem({item: data[0].value[0]})}
+                    </View>
                     <ButtonList
-                        key={key}
-                        data={value}
+                        estimatedItemSize={60}
+                        data={data[1].value}
                         keyExtractor = {(item) => item["id"].toString()}
-                        style= {key ? emergencyStyle : normalStyle}
+                        style= {normalStyle}
                         renderItem= {renderItem}
-                        sorter= {(vals) => 
-                            vals.sort((a,b) => a.name.localeCompare(b.name))
+                        sorter= {(vals) => {
+                            console.log(vals); 
+                            return vals.sort((a,b) => a.name.localeCompare(b.name))
                                 .sort((a,b) => b.priorityLevel - a.priorityLevel)
-                            }
+                            }}
                     />
-                )
+                </SafeAreaView>
             }
         </View>
             
@@ -209,3 +224,27 @@ const saveContact = async (item) => {
         console.log(e);
     }
 }
+
+const renderFront = (item) => (styles) => {
+    return (
+        <View style={{paddingVertical: 3, paddingHorizontal: 10}}>
+            <Text style={ 
+                        {fontFamily: styles.nameText,
+                        fontSize: styles.nameSize,
+                        color: styles.color}}>
+                {item.name} 
+            </Text>
+            <View style={{alignContent: "center", 
+                    marginTop: 5,
+                    marginLeft: 10}}>
+                <Text style={
+                                {fontFamily: styles.numberText,
+                                fontSize: styles.numberSize,
+                                color: styles.color}
+                            }>
+                    {formatPhoneNumber(item.number)}
+                </Text>
+            </View>
+        </View>)
+}
+

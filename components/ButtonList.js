@@ -1,10 +1,12 @@
-import {View, FlatList} from "react-native";
+import {View} from "react-native";
+import {FlashList} from "@shopify/flash-list";
 
 export default function ButtonList(props) {
-    const {data, sorter, renderItem, keyExtractor, style} = props;
+    const {data, sorter, renderItem, keyExtractor, style, estimatedItemSize} = props;
     return (
         <View style={style.bounding}>
-            <FlatList
+            <FlashList
+                estimatedItemSize={estimatedItemSize}
                 data={sorter(data)}
                 renderItem={renderItem}
                 keyExtractor={keyExtractor}

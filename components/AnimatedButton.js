@@ -1,31 +1,26 @@
-import { useTheme } from "@react-navigation/native";
 import { useState } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Pressable, StyleSheet } from "react-native";
+import Animated from "react-native-reanimated"
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-export default function Button(props) {
-    const {behind, front, under, onPress, onLongPress, accessibilityLabel, accessibilityHint} = props;
-    let {styles, delayLongPress} = props;
-    const {colors, fonts} = useTheme();
+export default function AnimatedButton(props) {
+    const {behind, front, under} = props;
+    let {styles} = props;
     const [pressed, setPressed] = useState(false);
     if (typeof styles === "function") {
         styles = styles(pressed);
     }
 
-    delayLongPress = delayLongPress ? delayLongPress : 500;
-
     return (
         <View style={[ styles.cells,
                         {flexDirection: "column"}]}>
-            <Pressable
-                accessibilityLabel={accessibilityLabel}
-                accessibilityHint={accessibilityHint}
+            <AnimatedPressable
+                {...props}
                 onTouchStart= {() => setPressed(true)}
                 onTouchEnd={() => setPressed(false)}
-                onTouchCancel={() => {setPressed(false)}}
-                onPress={onPress}
-                onLongPress={onLongPress}
-                delayLongPress={delayLongPress}
+                onTouchCancel={() => setPressed(false)}
+                delayLongPress={props.delayLongPress ? props.delayLongPress : 500}
                 style={ styles.button }>
                 <View style={{flexDirection: "column"}}>
                     <View>
@@ -35,7 +30,7 @@ export default function Button(props) {
                         ? front(styles.front) 
                         : front}
                 </View>
-            </Pressable>
+            </AnimatedPressable>
             {under}
         </View>
     )

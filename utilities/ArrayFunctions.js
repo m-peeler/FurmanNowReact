@@ -16,6 +16,8 @@ export default function arrayPartition(arr, partitionOn) {
             partitions[partitionVal] = [element];
         }
     })
-
+    console.log(partitions);
+    console.log(partitions.true);
+    console.log(partitions["false"]);
     return partitions;
 }

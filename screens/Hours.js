@@ -3,8 +3,9 @@ import {SafeAreaView, StyleSheet, Text, View} from "react-native"
 import useDataLoadFetchCache from "../hooks/useDataLoadFetchCache";
 import { useEffect, useState } from "react";
 import ButtonList from "../components/ButtonList";
+import { parseTime } from "../utilities/DateTimeFunctions";
 
-export default function Hours({navigation, pages}) {
+export default function Hours(props) {
     const {colors, fonts} = useTheme();
 
     const [hoursData, hoursLoad, hoursFetch] = 
@@ -88,12 +89,13 @@ export default function Hours({navigation, pages}) {
 
     const normalStyle = {
         bounding: {
+            alignSelf: "center",
+            height: "97%",
+            width: "95%",
             borderRadius: 10, 
             backgroundColor: colors.card, 
-            marginHorizontal: 20,
-            marginVertical: 5,
-            marginBottom: 10,
-            padding: 5
+            marginVertical: "2.5%",
+            padding: 5,
         },
         loadingText: {
             fontFamily: fonts.bold, 
@@ -104,19 +106,41 @@ export default function Hours({navigation, pages}) {
     };
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{height:"100%", width:"100%"}}>
             {(!hoursLoad || !hoursFetch) &&
              (!buildingLoad || !buildingFetch) && 
              {data} &&
                 <ButtonList
+                    estimatedItemSize={200}
                     style={normalStyle}
                     sorter={((vals) => vals.sort(([k1, v1],[k2, v2]) => k1.localeCompare(k2)))}
                     data= {data}
                     renderItem={renderHours}
-                    keyExtractor={([key, value]) => value.id + value.day + value.buildingID}
+                    keyExtractor={([key, val]) => {
+                        console.log(key, val);
+                        return key;
+                    }}
                 />}
         </SafeAreaView>
     )
+}
+
+const formatHourRange = (start, end) => {
+    let startam, endam;
+    const hoursToAm = (hours) => {
+        return hours.getHours() - 12 > 0 && hours.getHours() != 24 ? "pm" : "am";
+    }
+    startam = hoursToAm(start);
+    endam = hoursToAm(end);
+    const hoursToStr = (hours) => {
+        return `${hours % 12 == 0 ? 12 : hours % 12}`;
+    }
+    const formatTimeNums = (date) => {
+        return `${hoursToStr(date.getHours())}:${date.getMinutes() < 10 ? "0" : "" }${date.getMinutes()}`
+    }
+    let stStr = formatTimeNums(start);
+    let edStr = formatTimeNums(end);
+    return `${stStr}${endam != startam ? " " + startam : ""} to ${edStr} ${endam}`
 }
 
 function sortAndCollateHours(hoursList) {
@@ -166,9 +190,9 @@ function makeHoursString([key, hours]) {
         } else if (parts.length == 1) {
             return `${parts[0]}`;
         } else if (parts.length == 2) {
-            return `${parts[0]} and ${joinParts(parts.slice(1))}`;
+            return `${parts[0]} and \n${joinParts(parts.slice(1))}`;
         } else {
-            return `${parts[0]}, ${joinParts(parts.slice(1))}`;
+            return `${parts[0]}, \n${joinParts(parts.slice(1))}`;
         }
     }
 
@@ -194,6 +218,6 @@ function formatStartEnd(start, end) {
     } else if (end == "null") {
         return start;
     }
-    return `${start} to ${end}`;
+    return `${formatHourRange(parseTime(start), parseTime(end))}`;
 }
 

@@ -9,55 +9,50 @@ import Dates from "./screens/Dates";
 import Athletics from "./screens/Athletics";
 import Hours from "./screens/Hours";
 import Health from "./screens/Health";
+import Transit from "./screens/Transit";
+import Map from "./screens/Map";
 
 
 const Stack = createNativeStackNavigator();
 
+class Page {
+    constructor(id, name, {icon=defaultIcon, category = "None", showName=true}) {
+        this.id = id;
+        this.name = name;
+        this.icon = icon;
+        this.category = category;
+        this.showName = showName;
+    }
+}
+
+const defaultIcon = "./assets/images/icon.png";
+const catHome = "Home Screen";
+const catNews = "News Sources";
 const pages = [
-    { id: 1, name: "Contact", page: "Contact", icon: "./assets/images/icon.png"},
-    { id: 2, name: "Athletics", page: "Athletics", icon: "./assets/images/icon.png"},
-    { id: 3, name: "Hours", page: "Hours", icon: "./assets/images/icon.png"},
-    { id: 4, name: "Menus", page: "Menus", icon: "./assets/images/icon.png"},
-    { id: 5, name: "Events", page: "Events", icon: "./assets/images/icon.png"},
-    { id: 6, name: "Map", page: "Map", icon: "./assets/images/icon.png"},
-    { id: 7, name: "Transit", page: "Transit", icon: "./assets/images/icon.png"},
-    { id: 8, name: "Health", page: "Health", icon: "./assets/images/icon.png"},
-    { id: 9, name: "Dates", page: "Dates", icon: "./assets/images/icon.png"},
+    [new Page(1, "Contact", {category: catHome}), Contacts],
+    [new Page(2, "Athletics", {category: catHome}),  Athletics],
+        [new Page(21, "Athletics-More-Info", {showName: false}),  Blank],
+    [new Page(3, "Hours", {category: catHome}),  Hours],
+        [new Page(31, "Hours-More-Info", {showName: false}),  Blank],
+    [new Page(4, "Dining", {category: catHome}),  Blank],
+        [new Page(41, "Dining-More-Info", {showName: false}),  Blank],
+    [new Page(5, "Events", {category: catHome}),  Events],
+        [new Page(51, "Events-More-Info", {showName: false}),  Blank],
+    [new Page(6, "Map", {category: catHome}),  Map],
+    [new Page(7, "Transit", {category: catHome}),  Transit],
+    [new Page(8, "Health", {category: catHome}),  Health],
+    [new Page(9, "Dates", {category: catHome}),  Dates],
+
+        [new Page(101, "The Paladin", {category: catNews}),  Blank],
+        [new Page(102, "FUNC", {category: catNews}),  Blank],
+        [new Page(103, "The Echo", {category: catNews}),  Blank],
+        [new Page(104, "Christo et Doctrinae", {category: catNews}),  Blank],
+        [new Page(105, "President's Page", {category: catNews}),  Blank],
+        [new Page(106, "In the News", {category: catNews}),  Blank],
 ]
-
-const pageComponents = {
-    "Contact" : Contacts,
-    "Athletics": Athletics,
-    "Hours": Hours,
-    "Menus": Blank,
-    "Events": Events,
-    "Map": Blank,
-    "Transit": Blank,
-    "Health": Health,
-    "Dates": Dates,
-}
-
-const news = [
-    { id: 101, name: "The Paladin", page: "The Paladin", icon: "./assets/images/icon.png"},
-    { id: 102, name: "FUNC", page: "FUNC", icon: "./assets/images/icon.png"},
-    { id: 103, name: "The Echo", page: "The Echo", icon: "./assets/images/icon.png"},
-    { id: 104, name: "Christo et Doctrinae", page: "Christo et Doctrinae", icon: "./assets/images/icon.png"},
-    { id: 105, name: "President's Page", page: "President's Page", icon: "./assets/images/icon.png"},
-    { id: 106, name: "In the News", page: "In the News", icon: "./assets/images/icon.png"},
-]
-
-const newsComponents = {
-    "The Paladin": Blank,
-    "FUNC": Blank,
-    "The Echo": Blank,
-    "Christo et Doctrinae": Blank,
-    "President's Page": Blank,
-    "In the News": Blank,
-}
-
 
 export default function Navigation(props) {
-    const {colors} = useTheme();
+    const {colors, fonts} = useTheme();
     console.log(colors);
     return (
         <Stack.Navigator
@@ -71,32 +66,30 @@ export default function Navigation(props) {
                 headerTitleStyle: {
                     fontWeight: "bold",
                     fontSize: 30,
-                    fontFamily: "Abril Fatface Italic"
+                    fontFamily: fonts.heading
                 }}}>
                 <Stack.Screen name="Home" 
                     component={HomeScreen} 
-                    initialParams={{pages: pages}}
+                    initialParams={{pages: 
+                        pages.filter(([page, c]) => page.category == catHome)
+                            .map(([page, c]) => page)
+                    }}
                     options={{title: "Home"}}/>
                 <Stack.Screen name="Feed" 
                     component={Feed} 
-                    initialParams={{pages: news}}
+                    initialParams={{pages: 
+                        pages.filter(([page, c]) => page.category == catNews)
+                            .map(([page, c]) => page)    
+                    }}
                     options={{title: "News"}} />
                 {pages.map(page =>
                         <Stack.Screen 
-                            name={page.name}
-                            component={pageComponents[page.page]}
-                            key={page.id}
+                            name={page[0].name}
+                            component={page[1]}
+                            key={page[0].id}
                             options={{
-                                title: page.name
+                                title: page[0].showName ? page[0].name : ""
                             }}
-                        />
-                )}
-                {news.map(page =>
-                        <Stack.Screen
-                            name={page.name}
-                            component={newsComponents[page.page]}
-                            key={page.id}
-                            options={{title: page.name}}
                         />
                 )}
             </Stack.Group>

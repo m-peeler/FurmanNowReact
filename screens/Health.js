@@ -2,7 +2,7 @@ import { useTheme } from "@react-navigation/native"
 import {SafeAreaView, StyleSheet, Text} from "react-native"
 import useDataLoadFetchCache from "../hooks/useDataLoadFetchCache";
 
-export default function Health({navigation, pages}) {
+export default function Health(props) {
     const {colors, fonts} = useTheme();
     const [data, loading, fetching] = 
         useDataLoadFetchCache(

@@ -1,6 +1,10 @@
-import {SafeAreaView, View, StyleSheet, Text, FlatList, Dimensions} from "react-native";
+import {SafeAreaView, View, StyleSheet, Text, Dimensions} from "react-native";
+import {FlashList} from "@shopify/flash-list";
 import Button from "../components/Button";
 import {useTheme} from "@react-navigation/native";
+import {renderHSNavButton} from "../components/HomeScreenNavButton";
+import {useHeaderHeight} from "@react-navigation/elements";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HomeScreen(props) {
     const {colors, fonts} = useTheme();
@@ -15,49 +19,54 @@ export default function HomeScreen(props) {
             fontSize: 18,
             padding: 10,
         },
-        buttonDesign: {
-            button: {
-                width: windowHeight / 7 * .8,
-                height: windowHeight / 7 * .8,
-                backgroundColor: buttonColor,
-                color: buttonTextColor,
-                borderRadius: 10,
-            },
-            cells: {
-                flex: 1,
-                width: "33.333%",
-                alignItems: "center" 
+        buttonStyles: (pressed) => {
+            return {
+                button: {
+                    width: windowHeight / 7 * .8,
+                    height: windowHeight / 7 * .8,
+                    backgroundColor: buttonColor(pressed),
+                    color: buttonTextColor(pressed),
+                    borderRadius: 10,
+                },
+                cells: {
+                    flex: 1,
+                    width: "33.333%",
+                    alignItems: "center" 
+                }
             }
         },
     })
 
-    const newsStyles = StyleSheet.create({
-        label: {
-            textAlign: "center",
-            fontFamily: fonts.heading,
-            padding: 30,
-            fontSize: 40,
+    const newsStyles = (pressed) => StyleSheet.create({
+        front: {
+            label: {
+                textAlign: "center",
+                fontFamily: fonts.heading,
+                padding: 30,
+                fontSize: 40,
+                color: buttonTextColor(pressed)
+            }
         },
-        buttonDesign: {
-            button: {
-                width: "100%",
-                backgroundColor: buttonColor,
-                color: buttonTextColor, 
-                borderRadius: 20},
-             cells: {
-                paddingHorizontal: 10,
-                paddingBottom: 5
-             }
+        button: {
+            backgroundColor: buttonColor(pressed),
+            color: buttonTextColor(pressed), 
+            borderRadius: 20,
         },
-    })
+        cells: {
+            paddingHorizontal: 10,
+            marginBottom: 10
+        }
+})
+
+    const headerHeight = useHeaderHeight();
+    const {bottom : bottomHeight} = useSafeAreaInsets();
+    const displayableHeight = Dimensions.get("window").height - headerHeight - bottomHeight;
+    const pages = props.route.params.pages;
 
     const styles = StyleSheet.create({
         container: {
-            flex: 1,
-            flexDirection: "row",
             backgroundColor: colors.background,
-            alignContent: "center",
-            justifyContent: "center",
+            alignItems: "center"
         },
         headings: {
             fontSize: 18,
@@ -67,14 +76,16 @@ export default function HomeScreen(props) {
             justifyContent: "center",
         },
         weather: {
-            flex: 1.5,
             flexDirection: "row",
             backgroundColor: colors.card,
+            alignSelf: "flex-start",
             alignContent: "center",
             justifyContent: "center",
             borderBottomRightRadius: 15,
             borderBottomLeftRadius: 15,
+            top: -10,
             width: "100%",
+            height: displayableHeight / 7 * 2,
         }
     })
 
@@ -85,73 +96,48 @@ export default function HomeScreen(props) {
         return pressed ? colors.notificationText : colors.text;
     }
 
-    const renderNavButtons = (styles) => ({item}) => {
-        return (
-            <Button
-                accessibilityLabel=
-                    {item.name}
-                accessibilityHint=
-                    {`Press to travel to the ${item.name} page.`}
-                under={<Text
-                        accessible= {true}
-                        accessibilityLabel= {`${item.name}, title`}
-                        style= {buttonStyles.label}>
-                            {item.name}
-                        </Text>}
-                front={<View/>}
-                styles={buttonStyles.buttonDesign}
-                onPress={() => 
-                    props.navigation.navigate(item.page)}
-            /> 
-        )
-    }
-
-    const  renderResponsiveLabel = (text, style) => (pressed) => {
+    const  renderResponsiveLabel = (text) => (style) => {
         return  (
-            <Text style={[style, {
-                backgroundColor: "#00000000", 
-                color: buttonTextColor(pressed)}]}>
+            <Text style={style.label}>
                 {text}
             </Text>
         );
     }
 
-
-    const pages = props.route.params.pages;
     return (
-        <View style={[
-            styles.container,
-                {flex: 1,
-                    flexDirection: "column"},
-                    ]}>
-            <SafeAreaView style={styles.weather}>
+        <SafeAreaView style={{flex: 1, flexDirection: "column"}}>
+            <View style={styles.weather}>
                 <Text style={{alignSelf: "flex-end",
                                 fontFamily: fonts.bold, 
                                 paddingBottom:10,
                                 fontSize: 20,
                                 color: buttonTextColor(false)}}
                         >Weather</Text>
-            </SafeAreaView>
-            <View style={{marginTop: 10, flex: 4}}>
-                <FlatList
-                    style={{}}
-                    scrollEnabled={false}
-                    data={pages}
-                    numColumns={3}
-                    renderItem={renderNavButtons(buttonStyles)} 
-                />
             </View>
-            <SafeAreaView style={{flex: 1}}>
+            <View style={{height: displayableHeight / 7 * 4}}/>
+            <View style={{alignSelf: "flex-end", height: displayableHeight / 7, width: "100%"}}>
                 <Button 
                     accessibilityLabel = "News Feed"
                     accessibilityHint = "Press to travel to the news feed"
-                    front={renderResponsiveLabel("News Feed", newsStyles.label)}
+                    front={renderResponsiveLabel("News Feed")}
                     frontResponsive={true}
-                    styles={newsStyles.buttonDesign}
+                    styles={newsStyles}
                     onPress={() => props.navigation.navigate("Feed")} 
                 />
-            </SafeAreaView>
         </View>
+        <View style={{flex: "none", height: displayableHeight / 7 * 4, width: "100%", position: "absolute", top: displayableHeight / 7 * 2}}>
+            <FlashList
+                estimatedItemSize={100}
+                scrollEnabled={false}
+                data={pages}
+                numColumns={3}
+                renderItem={
+                    (p) => renderHSNavButton(buttonStyles, 
+                        () => props.navigation.navigate(p.item.name))(p)
+                    } 
+            />
+        </View>
+    </SafeAreaView>
     )
 }
 
