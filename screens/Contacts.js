@@ -162,6 +162,7 @@ export default function Contacts({navigation, pages}) {
                         {renderItem({item: data[0].value[0]})}
                     </View>
                     <ButtonList
+                        extraData={colors}
                         estimatedItemSize={60}
                         data={data[1].value}
                         keyExtractor = {(item) => item["id"].toString()}

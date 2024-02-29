@@ -127,6 +127,7 @@ export default function HomeScreen(props) {
         </View>
         <View style={{flex: "none", height: displayableHeight / 7 * 4, width: "100%", position: "absolute", top: displayableHeight / 7 * 2}}>
             <FlashList
+                extraData={colors}
                 estimatedItemSize={100}
                 scrollEnabled={false}
                 data={pages}

@@ -1,58 +1,21 @@
 import { useTheme } from "@react-navigation/native"
 import {SafeAreaView, StyleSheet, Text, View} from "react-native"
-import useDataLoadFetchCache from "../hooks/useDataLoadFetchCache";
-import { useEffect, useState } from "react";
 import ButtonList from "../components/ButtonList";
-import { parseTime } from "../utilities/DateTimeFunctions";
+import useBuildingHours from "../hooks/useBuildingHours";
+import { useState } from "react";
+import Button from "../components/Button";
 
 export default function Hours(props) {
     const {colors, fonts} = useTheme();
-
-    const [hoursData, hoursLoad, hoursFetch] = 
-        useDataLoadFetchCache(
-            "https://cs.furman.edu/~csdaemon/FUNow/hoursGet.php",
-            "DATA:Building-Hours-Cache",
-            async (d) => {
-                let json = await d.json();
-                let hours = {};
-                for (item of json.results) {
-                    if (item.buildingID in hours) {
-                        hours[item.buildingID].push(item);
-                    } else {
-                        hours[item.buildingID] = [item];
-                    }
-                }
-                return hours;
-            }
-        )
-
-    const [buildingData, buildingLoad, buildingFetch] = 
-        useDataLoadFetchCache(
-            "https://cs.furman.edu/~csdaemon/FUNow/buildingGet.php",
-            "DATA:Building-Info-Cache",
-            async (d) => {
-                let json = await d.json();
-                let buildings = {};
-                for (item of json.results) {
-                    buildings[item.buildingID] = item;
-                }
-                return buildings;
-            }
-        )
-
-    const [data, setData] = useState([]);
-
-    useEffect(() => {
-        setData(joinBuildingInfo(hoursData, buildingData))
-    }, [(!hoursLoad || !hoursFetch) && (!buildingLoad || !buildingFetch),
-        !hoursFetch && (!buildingLoad || !buildingFetch),
-        (!hoursLoad || !hoursFetch) && !buildingFetch])
+    const data = useBuildingHours();
 
     const style = StyleSheet.create({
         locationText: {
-            fontFamily: fonts.bold,
-            color: colors.text,
-            fontSize: 24,
+            title: {
+                fontFamily: fonts.bold,
+                color: colors.text,
+                fontSize: 24,
+            }
         }, 
         dayText: {
             fontFamily: fonts.regular,
@@ -63,28 +26,55 @@ export default function Hours(props) {
             flex: 1
         },
         hoursText: {
-            fontFamily: fonts.regular,
+            fontFamily: fonts.thin,
             color: colors.text,
             fontSize: 18,
             paddingRight: 10,
             paddingVertical: 0,
-            flex: 2.5           
+            flex: 2,
+            textAlign: "right" 
         }
     })
 
-    const renderHours = ({item}) => {
+    const HoursFront = ({item, engaged}) => {
         const [key, value] = item;
         return (
-            <View>
-                <Text style={style.locationText}>{`${key}`}</Text>
-                {value.hours.map(([key, hours, hoursString]) => 
-                    <View style={{flexDirection: "row"}}>
-                        <Text style={style.dayText}>{key}</Text>
-                        <Text style={style.hoursText} id={key}>{`${hoursString}`}</Text>
-                    </View>
+            <View style={{flexDirection: "column"}}>
+                <HoursTitleBar styles={style.locationText} name={key} information={value}/>
+                <View style={{flexDirection: "column"}}>
+                {value.schedule.dailySchedules(!engaged).map(([day, hours]) => 
+                    {
+                    return (
+                    <View key={day} accessible={true} 
+                            accessibilityLabel={`${key}, opened ${day} from ${hours}`}
+                            style={{flexDirection: "row", alignContent: "space-between"}}>
+                        <Text style={style.dayText}>{day}</Text>
+                        <Text style={style.hoursText} id={day}>{`${hours}`}</Text>
+                    </View> )
+                    }
                 )}
-            </View>
+                </View>
+            </View> 
         );
+    }
+
+    const HoursTitleBar = ({styles, name, information}) => {
+        const {colors, fonts} = useTheme();
+
+        let opened = information.schedule.isOpened(new Date(Date.now()));
+        let openedString = `${name} is currently ${opened ? "opened" : "closed"}.`
+        return (
+            <View accessible={true}
+                   accessibilityLabel={openedString}
+                    style={{flexDirection: "row", justifyContent: "space-between"}}>
+                <Text style={styles.title}>{`${name}`}</Text>
+                <View
+                    style={{padding: 3, borderRadius: 10, borderWidth: 5, borderColor: opened ? colors.positive : colors.negative, justifyContent: "center"}}>
+                    <Text style={{color: colors.text, fontFamily: fonts.bold}}>
+                        {opened ? "OPEN" : "CLOSED"}
+                    </Text>
+                </View>
+            </View>)
     }
 
     const normalStyle = {
@@ -105,119 +95,33 @@ export default function Hours(props) {
         scrollEnabled: true,
     };
 
+    const [buttonEngaged, setButtonEngaged] = useState(-1);
+
+    const renderHours = ({item, index}) => {
+
+        return (
+            <Button 
+                styles={{}}
+                onPress={() => {
+                    setButtonEngaged(buttonEngaged == index ? -1 : index)
+                }}
+                front={<HoursFront item={item} engaged={index == buttonEngaged} />}
+            />
+        )
+    }
+
     return (
         <SafeAreaView style={{height:"100%", width:"100%"}}>
-            {(!hoursLoad || !hoursFetch) &&
-             (!buildingLoad || !buildingFetch) && 
-             {data} &&
+            {{data} &&
                 <ButtonList
+                    extraData={buttonEngaged}
                     estimatedItemSize={200}
                     style={normalStyle}
                     sorter={((vals) => vals.sort(([k1, v1],[k2, v2]) => k1.localeCompare(k2)))}
                     data= {data}
                     renderItem={renderHours}
-                    keyExtractor={([key, val]) => {
-                        console.log(key, val);
-                        return key;
-                    }}
+                    keyExtractor={([key, value]) => key}
                 />}
         </SafeAreaView>
     )
 }
-
-const formatHourRange = (start, end) => {
-    let startam, endam;
-    const hoursToAm = (hours) => {
-        return hours.getHours() - 12 > 0 && hours.getHours() != 24 ? "pm" : "am";
-    }
-    startam = hoursToAm(start);
-    endam = hoursToAm(end);
-    const hoursToStr = (hours) => {
-        return `${hours % 12 == 0 ? 12 : hours % 12}`;
-    }
-    const formatTimeNums = (date) => {
-        return `${hoursToStr(date.getHours())}:${date.getMinutes() < 10 ? "0" : "" }${date.getMinutes()}`
-    }
-    let stStr = formatTimeNums(start);
-    let edStr = formatTimeNums(end);
-    return `${stStr}${endam != startam ? " " + startam : ""} to ${edStr} ${endam}`
-}
-
-function sortAndCollateHours(hoursList) {
-    let value = hoursList.sort(((e1, e2) => {
-        let ord = e1.dayorder.localeCompare(e2.dayorder)
-        if (ord == 0) return e1.Start.localeCompare(e2.Start);
-        return ord;
-    }))
-
-    let hours = []
-    let lastDayOrder = -1;
-    let indCurrent = -1;
-    for (let hour of value) {
-        if (hour.dayorder == lastDayOrder) {
-            hours[indCurrent][1].push(hour)
-        } else {
-            indCurrent += 1;
-            lastDayOrder = hour.dayorder;
-            hours.push([hour.day, [hour]]);
-        }
-    }
-    return hours;
-}
-
-function joinBuildingInfo(hoursData, buildingData) {
-    const temp = {};
-    for (let [key, value] of Object.entries(hoursData)) {
-        let hours = sortAndCollateHours(value);
-        hours = hours.map((item) => {
-            let string = makeHoursString(item);
-            return [item[0], item[1], string];
-        });
-        temp[buildingData[key]["name"]] = 
-            {
-                ...buildingData[key],
-                hours: hours,
-                lastUpdated: value[0].lastUpdated,
-            }
-    }
-    return Object.entries(temp);
-}
-
-function makeHoursString([key, hours]) {
-    function joinParts(parts) {
-        if (parts.length == 0) {
-            return "";
-        } else if (parts.length == 1) {
-            return `${parts[0]}`;
-        } else if (parts.length == 2) {
-            return `${parts[0]} and \n${joinParts(parts.slice(1))}`;
-        } else {
-            return `${parts[0]}, \n${joinParts(parts.slice(1))}`;
-        }
-    }
-
-    let string = [];
-    for (rng of hours) {
-        let temp = formatStartEnd(rng.Start, rng.End);
-        if (temp == "Closed" && string.length == 0){
-            string = [temp];
-        } else {
-            if (string.length > 0 && string[0] == "Closed") string[0] == temp;
-            else if (temp != "Closed") string.push(temp);
-        }
-    }
-    return `${joinParts(string)}`;
-}
-
-function formatStartEnd(start, end) {
-    if (start == null && end == null) {
-        return "Closed";
-    } 
-    if (start == "null") {
-        return end;
-    } else if (end == "null") {
-        return start;
-    }
-    return `${formatHourRange(parseTime(start), parseTime(end))}`;
-}
-

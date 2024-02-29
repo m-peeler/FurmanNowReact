@@ -11,6 +11,7 @@ import Hours from "./screens/Hours";
 import Health from "./screens/Health";
 import Transit from "./screens/Transit";
 import Map from "./screens/Map";
+import Dining from "./screens/Dining";
 
 
 const Stack = createNativeStackNavigator();
@@ -34,7 +35,7 @@ const pages = [
         [new Page(21, "Athletics-More-Info", {showName: false}),  Blank],
     [new Page(3, "Hours", {category: catHome}),  Hours],
         [new Page(31, "Hours-More-Info", {showName: false}),  Blank],
-    [new Page(4, "Dining", {category: catHome}),  Blank],
+    [new Page(4, "Dining", {category: catHome}),  Dining],
         [new Page(41, "Dining-More-Info", {showName: false}),  Blank],
     [new Page(5, "Events", {category: catHome}),  Events],
         [new Page(51, "Events-More-Info", {showName: false}),  Blank],
@@ -53,7 +54,6 @@ const pages = [
 
 export default function Navigation(props) {
     const {colors, fonts} = useTheme();
-    console.log(colors);
     return (
         <Stack.Navigator
             initialRouteName="Home">

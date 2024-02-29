@@ -5,6 +5,7 @@ const furmanNowCalName = "Furman Now!"
 
 export function parseDatetime(datetime) {
     // Assumes a formatting of YYYY-MM-DD HH:mm:ss
+    if (datetime == null) return
     const [date, time] = datetime.split(" ");
     const fdate = parseDate(date);
     const ftime = parseTime(time);
@@ -13,11 +14,13 @@ export function parseDatetime(datetime) {
 }
 
 export function parseDate(date) {
+    if (date == null) return
     const [year, month, day] = date.split("-");
     return new Date(parseInt(year), parseInt(month) - 1, parseInt(day) );
 }
 
 export function parseTime(time) {
+    if (time == null) return;
     const [hour, minute, second] = time.split(":");
     return new Date(0, 0, 0, parseInt(hour), parseInt(minute), parseInt(second));
 }

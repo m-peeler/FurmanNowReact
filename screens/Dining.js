@@ -4,7 +4,7 @@ import useDataLoadFetchCache from "../hooks/useDataLoadFetchCache";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 
-export default function Events({navigation, pages}) {
+export default function Dining({navigation, pages}) {
     const headerHeight = useHeaderHeight();
     const {bottom : bottomHeight} = useSafeAreaInsets();
     const displayableHeight = Dimensions.get("window").height - headerHeight - bottomHeight;
@@ -12,8 +12,8 @@ export default function Events({navigation, pages}) {
     const {colors, fonts} = useTheme();
     const [data, loading, fetching] = 
         useDataLoadFetchCache(
-            "https://cs.furman.edu/~csdaemon/FUNow/clpGet.php",
-            "DATA:Events-Cache",
+            "https://cs.furman.edu/~csdaemon/FUNow/dhMenuGet.php",
+            "DATA:DH-Dining-Cache",
             processFetch = async (data) => await data.json()
         )
 
@@ -26,7 +26,7 @@ export default function Events({navigation, pages}) {
         <SafeAreaView>
             {(!loading || !fetching) && 
                 
-                <Text style={style}>{data.results.map((item) => `${item.title} \t ${item.date}\n`)}</Text>}
+                <Text style={style}>{data.results.map((item) => `${item.meal} \t ${item.station} \t ${item.itemName}\n`)}</Text>}
         </SafeAreaView>
     )
 }
