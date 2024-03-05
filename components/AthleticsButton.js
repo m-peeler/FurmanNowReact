@@ -1,22 +1,48 @@
-import Button from "./Button";
-import { View, Text, StyleSheet, Alert, Platform } from "react-native";
+import { View, Text, StyleSheet, Alert, Platform, Pressable } from "react-native";
 import { isAllDay, addToCalendar } from "../utilities/DateTimeFunctions";
 import * as Calendar from "expo-calendar";
+import { useState } from "react";
 
 export default AthleticsButton = ({colors, fonts, item}) => { 
 
+    const [pressed, setPressed] = useState(false);
     const [status, requestPermissions] = Calendar.useCalendarPermissions();
     item.eventNameString = `Furman ${item.sportTitle} ${locIndText(item.location_indicator)} ${item.opponent}`;
+    const styles = buttonStyles(colors, fonts, item.location_indicator == "H", pressed)
+    const internalStyles = frontStyles(colors, fonts, item.location_indicator == "H", pressed)
 
     return (
-        <Button
-            front={AthleticsFront(item)}
+        <Pressable
             frontResponsive={true}
-            onLongPress={() => requestAddEvent(setupEventData(item), status, requestPermissions)}
-            styles={makeStyles(colors, fonts, item.location_indicator == "H")}
+            onTouchStart={() => setPressed(true)}
+            onTouchEnd={() => setPressed(false)}
+            onTouchCancel={() => setPressed(false)}
+            onLongPress=
+                {() => 
+                    requestAddEvent(
+                        setupEventData(item),
+                        status, 
+                        requestPermissions)
+                }
             accessibilityLabel={generateAccessibilitySummary(item)}
-            accessibilityHint= {"Click for more information."}
-        />
+            accessibilityHint={"Click for more information."}
+            style={styles} >
+            <View style={{flexDirection: "row"}}>
+                <Text style={internalStyles.title}>{item.sportTitle}</Text>
+                <Text style={internalStyles.versus}>
+                    {`${formatOpponent(item)}`}
+                </Text>
+            </View>
+            <View style={{flexDirection: "row"}}>
+                {item.noplayText != "" &&
+                    <Text style={internalStyles.cancelled}>{item.noplayText}</Text>
+                }  
+                {item.resultStatus != "" &&
+                    <Text style={internalStyles.victory}>{victoryMessage(item)}</Text>
+                }
+                <Text style={internalStyles.info}>{formatDatetime(item.eventdate)}</Text>
+            </View>
+        </Pressable>
     )
 }
 
@@ -44,31 +70,6 @@ function requestAddEvent(event, status, requestPermissions) {
         )
 }
 
-function AthleticsFront(item) {
-    return (styles) => {
-        return (
-            <View>
-                <View style={{flexDirection: "row"}}>
-                    <Text style={styles.title}>{item.sportTitle}</Text>
-                    <Text style={styles.versus}>
-                        {`${formatOpponent(item)}`}
-                    </Text>
-                </View>
-                <View style={{flexDirection: "row"}}>
-                    {item.noplayText != "" &&
-                        <Text style={styles.cancelled}>{item.noplayText}</Text>
-                    }  
-                    {item.resultStatus != "" &&
-                        <Text style={styles.victory}>{victoryMessage(item)}</Text>
-                    }
-                    <Text style={styles.info}>{formatDatetime(item.eventdate)}</Text>
-                </View>
-            </View>
-        )
-    }
-}
-
-
 function victoryMessage(item) {
     switch (item.resultStatus) {
         case "L":
@@ -92,71 +93,61 @@ function formatOpponent(item) {
     }
 }  
 
-function makeStyles(colors, fonts, home) {
-    return (pressed) => {
-        return StyleSheet.create({
-            button: buttonStyles(colors, fonts, home, pressed),
-            front: frontStyles(colors, fonts, home, pressed)
-        })
-    }
-}
-
 function buttonStyles(colors, fonts, home, pressed) {
-        return StyleSheet.create({
-            backgroundColor: 
-                pressed ?
-                    colors.notification : 
-                    home ? colors.accentCard : colors.card,
-            color: 
-                pressed ? 
-                    colors.notificationText : 
-                    home ? colors.accentText : colors.text,
-            borderRadius: 5,
-            margin: 2,
-            padding: 6
-        })
-    };
+    return StyleSheet.create({
+        backgroundColor: 
+            pressed ?
+                colors.notification : 
+                colors.card,
+        color: 
+            pressed ? 
+                colors.notificationText : 
+                home ? colors.accentText : colors.text,
+        borderRadius: 10,
+        margin: 2,
+        padding: 6
+    })
+};
 
 function frontStyles(colors, fonts, home, pressed) {
-        let sty = buttonStyles(colors, fonts, home, pressed);
-        return StyleSheet.create({
-            ...sty,
-            title: {
-                flex: 4,
-                fontFamily: fonts.bold,
-                fontSize: 24,
-                color: sty.color,
-            },
-            versus: {
-                flex: 2,
-                fontFamily: fonts.italic,
-                fontSize: 16,
-                color: sty.color,
-                textAlign: "right",
-                alignSelf: "flex-end"
-            },
-            info: {
-                fontFamily: fonts.bold,
-                fontSize: 16,
-                color: sty.color,
-                flex: 1,
-                textAlign: "right",
-                marginRight: 10
-            },
-            cancelled: {
-                fontFamily: fonts.italic,
-                fontSize: 16,
-                marginLeft: 10,
-                color: pressed ? colors.emergencyText : colors.negative
-            }, 
-            victory: {
-                fontFamily: fonts.italic,
-                fontSize: 16,
-                color: sty.color,
-                alignContent: "center",
-                marginLeft: 10,
-                flex: 1
-            }
+    let sty = buttonStyles(colors, fonts, home, pressed);
+    return StyleSheet.create({
+        title: {
+            flex: 4,
+            fontFamily: fonts.bold,
+            fontSize: 24,
+            color: sty.color,
+        },
+        versus: {
+            flex: 2,
+            fontFamily: fonts.italic,
+            fontSize: 16,
+            color: sty.color,
+            textAlign: "right",
+            alignSelf: "flex-end"
+        },
+        info: {
+            fontFamily: fonts.bold,
+            fontSize: 16,
+            color: sty.color,
+            flex: 1,
+            textAlign: "right",
+            marginRight: 10
+        },
+        cancelled: {
+            fontFamily: fonts.italic,
+            fontSize: 16,
+            marginLeft: 10,
+            color: pressed ? colors.emergencyText : colors.negative
+        }, 
+        victory: {
+            fontFamily: fonts.italic,
+            fontSize: 16,
+            color: sty.color,
+            alignContent: "center",
+            marginLeft: 10,
+            flex: 1
+        }
     })};
 
 function locIndText(loc_ind) {

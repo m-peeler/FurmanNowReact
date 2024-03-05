@@ -7,9 +7,9 @@ export default function useBuildingHours() {
         useDataLoadFetchCache(
             "https://cs.furman.edu/~csdaemon/FUNow/hoursGet.php",
             "DATA:Building-Hours-Cache",
-            async (d) => {
-                let json = await d.json();
+            (json) => {
                 let hours = {};
+                console.log("Hours Results", json.results)
                 for (const item of json.results) {
                     if (item.buildingID in hours) {
                         hours[item.buildingID].push(item);
@@ -17,7 +17,9 @@ export default function useBuildingHours() {
                         hours[item.buildingID] = [item];
                     }
                 }
-                return hours;
+                const output = Object.keys(hours).length > 0 ? hours : null;
+                console.log("Hours output", output);
+                return output;
             }
         )
 
@@ -25,25 +27,30 @@ export default function useBuildingHours() {
         useDataLoadFetchCache(
             "https://cs.furman.edu/~csdaemon/FUNow/buildingGet.php",
             "DATA:Building-Info-Cache",
-            async (d) => {
-                let json = await d.json();
+            (json) => {
+                console.log("Building results", json.results)
                 let buildings = {};
                 for (const item of json.results) {
                     buildings[item.buildingID] = item;
                 }
-                return buildings;
+                const output = Object.keys(buildings).length > 0 ? buildings : null;
+                console.log("Building output", output)
+                return output;
             }
         )
 
-    const [data, setData] = useState([]);
+    const [data, setData] = useState();
+    const [dataExists, setDataExists] = useState(false);
 
     useEffect(() => {
-        setData(joinBuildingInfo(hoursData, buildingData))
-    }, [(!hoursLoad || !hoursFetch) && (!buildingLoad || !buildingFetch),
-        !hoursFetch && (!buildingLoad || !buildingFetch),
-        (!hoursLoad || !hoursFetch) && !buildingFetch])
+        if (hoursData == undefined || buildingData == undefined) return;
+        console.log("Entered", hoursData[0], buildingData[0]);
+        const structured = joinBuildingInfo(hoursData, buildingData);
+        setData(structured);
+        setDataExists(true);
+    }, [hoursData != undefined, buildingData != undefined, !hoursFetch, !hoursLoad])
 
-    return data;
+    return [data, dataExists];
 
 }
 
@@ -59,9 +66,8 @@ enum DaysOfWeek {
 
 class Schedule {
 
-    static DAYORDER = [DaysOfWeek.MONDAY, DaysOfWeek.TUESDAY, DaysOfWeek.WEDNESDAY, 
-                        DaysOfWeek.THURSDAY, DaysOfWeek.FRIDAY, DaysOfWeek.SATURDAY,
-                        DaysOfWeek.SUNDAY]
+    static DAYORDER = [DaysOfWeek.SUNDAY, DaysOfWeek.MONDAY, DaysOfWeek.TUESDAY, 
+        DaysOfWeek.WEDNESDAY, DaysOfWeek.THURSDAY, DaysOfWeek.FRIDAY, DaysOfWeek.SATURDAY,]
 
     static dayToNum (day : DaysOfWeek) {
         return Schedule.DAYORDER.indexOf(day);
@@ -84,20 +90,23 @@ class Schedule {
     }
 
     addHourRangeToDay(day : DaysOfWeek, hourRange : HourRange) {
+        for (const cur of this.sched[day]) {
+            if (cur.isInRange(hourRange.end) || cur.isInRange(hourRange.start)) {
+                cur.mergeRange(hourRange);
+                return
+            }
+        }
         this.sched[day].push(hourRange);
+        this.sched[day].sort((a,b) => compareTimes(a.start, b.start));
     }
 
     makeHoursString(day : DaysOfWeek) : string {
         let hours = this.sched[day]
         function joinParts(parts : string[]) {
-            if (parts.length == 0) {
-                return "";
-            } else if (parts.length == 1) {
+            if (parts.length == 1) {
                 return `${parts[0]}`;
-            } else if (parts.length == 2) {
-                return `${parts[0]} and \n${joinParts(parts.slice(1))}`;
             } else {
-                return `${parts[0]}, \n${joinParts(parts.slice(1))}`;
+                return `${parts[0]}\n${joinParts(parts.slice(1))}`;
             }
         }
     
@@ -120,7 +129,6 @@ class Schedule {
                 {timeZone: "America/New_York", 
                 weekday: "long"})
             );
-
     }
 
     isOpened(time : Date) : boolean {
@@ -181,6 +189,11 @@ class HourRange {
         if (this.start == null && this.end == null) return false;
         return (compareTimes(this.start, time) <= 0 && 
             compareTimes(time, this.end) <= 0);
+    }
+
+    mergeRange(that : HourRange) {
+        this.start = compareTimes(this.start, that.start) <= 0 ? this.start : that.start;
+        this.end = compareTimes(this.end, that.end) >= 0 ? this.end : that.end
     }
     
     formatStartEnd() {
@@ -249,6 +262,7 @@ function sortAndCollateHours(hoursList : [{day: string, dayorder : number , Star
 }
 
 function joinBuildingInfo(hoursData, buildingData) {
+    if (hoursData == undefined || buildingData == undefined || hoursData.length == 0 || buildingData.length == 0) { return null };
     const temp = {};
 
     for (let key in hoursData) {
@@ -258,8 +272,8 @@ function joinBuildingInfo(hoursData, buildingData) {
                 ...buildingData[key],
                 schedule: sched,
                 lastUpdated: hoursData[key][0].lastUpdated,
-            }
-    }
+            };
+    };
     return Object.entries(temp);
 }
 

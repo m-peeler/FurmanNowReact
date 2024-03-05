@@ -22,10 +22,11 @@ SplashScreen.preventAutoHideAsync();
 export default function App(props) {
   const scheme = useColorScheme();
   const [fontsLoaded] = useFonts(customFonts);
+  
 
   const handleOnLayout = useCallback(async () => {
     if (fontsLoaded) {
-      await SplashScreen.hideAsync(); //hide the splashscreen
+      await SplashScreen.hideAsync(); 
     }
   }, [fontsLoaded]);
 
@@ -35,12 +36,10 @@ export default function App(props) {
 
   if (!fontsLoaded) return null;
 
-  console.log(scheme == "light" ? DefaultTheme : DarkTheme);
-
   return (
     <SafeAreaProvider>
       <NavigationContainer 
-      theme={scheme == "light" ? DefaultTheme : DarkTheme}>
+        theme={scheme == "light" ? DefaultTheme : DarkTheme}>
         <Navigation />
       </NavigationContainer>
     </SafeAreaProvider>

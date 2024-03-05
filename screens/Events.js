@@ -14,7 +14,7 @@ export default function Events({navigation, pages}) {
         useDataLoadFetchCache(
             "https://cs.furman.edu/~csdaemon/FUNow/clpGet.php",
             "DATA:Events-Cache",
-            processFetch = async (data) => await data.json()
+            processFetch = (data) => data
         )
 
     const style = StyleSheet.create({

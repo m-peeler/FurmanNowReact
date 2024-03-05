@@ -1,19 +1,17 @@
 import {Linking, Text, View, Dimensions, Alert} from "react-native";
-import React, {useState, useEffect} from "react";
+import React from "react";
 import {useTheme} from "@react-navigation/native";
 import {useHeaderHeight} from "@react-navigation/elements";
 import Button from "../components/Button";
-import arrayPartition from "../utilities/ArrayFunctions";
 import ButtonList from "../components/ButtonList";
-import useDataLoadFetchCache from "../hooks/useDataLoadFetchCache";
 import * as NativeContact from "expo-contacts";
 import { SafeAreaView } from "react-native-safe-area-context";
+import useContacts from "../hooks/useContacts";
 
 // Sets the priorityLevel threshold at which a button will 
 // recieve the emergency coloration and be placed on the 
 // emergency list at the top.
 const emergencyThreshold = 30;
-const fupoPriorityID = 99;
 
 function formatPhoneNumber(phone) {
     if (phone.length != 10) {
@@ -26,30 +24,9 @@ function formatPhoneNumber(phone) {
     }
 }
 
-export default function Contacts({navigation, pages}) {
+export default function Contacts() {
     const {colors, fonts} = useTheme();
     const headerHeight = useHeaderHeight();
-
-    const processContactsResponse = async (resp) => {
-        const parse = await resp.json();
-        const partitioned = arrayPartition(parse["results"], ((item) => {return item["priorityLevel"] >= fupoPriorityID}));
-        const data = [{key: true,
-                       value: partitioned["true"]},
-                      {key: false,
-                       value: partitioned["false"]}]
-        console.log("HOWDY THERE");
-        console.log(data[0])
-        console.log(data[0].value)
-        console.log(data[0].value[0]);
-    
-        return data;
-    }
-
-    const [data, loading, fetching] = 
-        useDataLoadFetchCache(
-            "https://cs.furman.edu/~csdaemon/FUNow/contactsGet.php", 
-            "DATA:Contacts-Cache", 
-            processContactsResponse);
 
     function renderItem ({item}) {  
         const emergency = item.priorityLevel >= emergencyThreshold;
@@ -141,22 +118,16 @@ export default function Contacts({navigation, pages}) {
         scrollEnabled: false,
     };
 
+    const [data, fetching, loading] = useContacts();
+
     return (
-        // What seems to be happening here is that FlatList is a bit
-        // of a diva and wants to have all the space on the screen,
-        // even if there's another FlatList trying to render above 
-        // it, and so the last few elements are too low to be readable.
-        // If you ever add more emergency numbers you're gonna have
-        // to manually tweak this, I can't come up with any good
-        // ideas for it.
-        <View style={{flex:1, paddingBottom: 38 + 60 * (data.length > 0 ? data[0].value.length : 1)}}>
-            {fetching && loading && 
+        <View style={{flex:1, paddingBottom: 38 + 60}}>
+            {(fetching && loading) && 
                 <View style={normalStyle.bounding}>
                     <Text style={normalStyle.loadingText}>Loading...</Text>
                 </View>
             }
-            {(!fetching || !loading) && 
-               data &&
+            {data && data[0] != undefined && (!fetching || !loading) &&
                 <SafeAreaView>
                     <View style={emergencyStyle.bounding}>
                         {renderItem({item: data[0].value[0]})}

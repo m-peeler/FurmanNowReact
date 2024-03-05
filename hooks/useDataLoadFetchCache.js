@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function useDataLoadFetchCache(
         fetchFrom, 
@@ -6,47 +7,57 @@ export default function useDataLoadFetchCache(
         processFetch = async (data) => await data.json(), 
         discardCache = (cache) => false) 
 {
-    const [data, setData] = useState([]);
+    const [data, setData] = useState();
     const [loading, setLoading] = useState(true);
-    const [fetching, setFetching] = useState(true)
+    const [fetching, setFetching] = useState(true);
+    const [exists, setExists] = useState(false);
     
-    const fetchData = async () => {
+    const processedLoad = async () => {
         try {
-            const resp = await fetch(fetchFrom);
-            const fetched = await processFetch(resp);
-            setData(fetched);
-            setFetching(false);
-        } catch (e) { console.log(e)}
-        // Upon successful retrieval, stores data
-        // locally so it can be used even when not connected
-        // to internet.
-    }
-
-    const loadCache = async() => {
-        try {
-            const jsonValue = await AsyncStorage.getItem(cacheTo);
-            const data = jsonValue != null ? JSON.parse(jsonValue) : null;
-            if (data && discardCache(data)) {
-                await AsyncStorage.removeItem(cacheTo);
-            } else {
-                setData(data);
+            const cache = await AsyncStorage.getItem(cacheTo)
+            const parsed = processFetch(JSON.parse(cache))
+            if (parsed && discardCache(parsed)) {
+                AsyncStorage.removeItem(cacheTo)
+                    .catch(e => console.log(e))
+            } else if (fetching && parsed.length != 0) {
+                setData(parsed);
+                console.log("cached:", parsed);
                 setLoading(false);
             }
-        } catch (e) {}
+        } catch (e) {
+            console.log("2", e);
+        }
     }
 
-    const storeCache = async (value) => {
+    const processedFetch = async () => {
         try {
-            const jsonValue = JSON.stringify(value);
-            await AsyncStorage.setItem(cacheTo, jsonValue);
-        } catch (e) {}
+            const resp = await fetch(fetchFrom);
+            const jsonResp = await resp.json();
+            const fetched = processFetch(jsonResp);
+            if (fetched != null && fetched != [] && fetched != {}) {
+                await setData(fetched);
+                setFetching(false);
+                storeCache(jsonResp);
+            }
+        } catch (error) {console.log("1", error)}
+    }
+
+    const storeCache = (resp) => {
+        AsyncStorage.setItem(cacheTo, JSON.stringify(resp))
+                    .catch(e => console.log(e))
     }
 
     useEffect(() => {
-        loadCache();
-        fetchData();
-        storeCache(data);
+        async function loadFetch() {
+            await processedLoad();
+            await processedFetch();   
+        }
+        loadFetch();
     }, []);
 
-    return [data, loading, fetching];
+    useEffect(() => {
+        setExists(true);
+    }, [loading, fetching])
+
+    return [data, loading, fetching, exists];
 }

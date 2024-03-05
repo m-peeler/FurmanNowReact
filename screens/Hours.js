@@ -3,44 +3,61 @@ import {SafeAreaView, StyleSheet, Text, View} from "react-native"
 import ButtonList from "../components/ButtonList";
 import useBuildingHours from "../hooks/useBuildingHours";
 import { useState } from "react";
-import Button from "../components/Button";
+import { Pressable } from "react-native";
 
 export default function Hours(props) {
     const {colors, fonts} = useTheme();
-    const data = useBuildingHours();
+    const [data, dataExists] = useBuildingHours();
 
-    const style = StyleSheet.create({
-        locationText: {
-            title: {
-                fontFamily: fonts.bold,
-                color: colors.text,
-                fontSize: 24,
-            }
-        }, 
-        dayText: {
-            fontFamily: fonts.regular,
-            color: colors.text,
-            fontSize: 18,
-            paddingLeft: 10,
-            paddingVertical: 0,
-            flex: 1
-        },
-        hoursText: {
-            fontFamily: fonts.thin,
-            color: colors.text,
-            fontSize: 18,
-            paddingRight: 10,
-            paddingVertical: 0,
-            flex: 2,
-            textAlign: "right" 
+    const styles = (pressed) => StyleSheet.create({
+        front : (engaged) => {return {
+            locationText: {
+                title: {
+                    fontFamily: fonts.bold,
+                    color: pressed ? colors.notificationText : colors.text,
+                    fontSize: 24,
+                    flex: 2,
+                    flexGrow: 1
+                },
+                openIndicator : (opened) => { return {
+                    alignSelf: "center",
+                    borderRadius:10, 
+                    height:20, 
+                    width: 20, 
+                    margin: 5, 
+                    backgroundColor: pressed 
+                            ? colors.notificationText 
+                            : opened ? colors.positive : colors.negative
+                }}
+            }, 
+            dayText: {
+                fontFamily: fonts.regular,
+                color: pressed ? colors.notificationText : colors.text,
+                fontSize: 18,
+                paddingLeft: 10,
+                paddingVertical: 0,
+                flex: 1
+            },
+            hoursText: {
+                fontFamily: fonts.thin,
+                color: pressed ? colors.notificationText : colors.text,
+                fontSize: 18,
+                paddingRight: 10,
+                paddingVertical: 0,
+                flex: 2,
+                textAlign: "right" 
+            },
+        }},
+        button : {
+            backgroundColor: pressed ? colors.notification : colors.card
         }
     })
 
-    const HoursFront = ({item, engaged}) => {
+    const HoursFront = ({styles, item, engaged}) => {
         const [key, value] = item;
         return (
             <View style={{flexDirection: "column"}}>
-                <HoursTitleBar styles={style.locationText} name={key} information={value}/>
+                <HoursTitleBar styles={styles.locationText} name={key} information={value}/>
                 <View style={{flexDirection: "column"}}>
                 {value.schedule.dailySchedules(!engaged).map(([day, hours]) => 
                     {
@@ -48,8 +65,8 @@ export default function Hours(props) {
                     <View key={day} accessible={true} 
                             accessibilityLabel={`${key}, opened ${day} from ${hours}`}
                             style={{flexDirection: "row", alignContent: "space-between"}}>
-                        <Text style={style.dayText}>{day}</Text>
-                        <Text style={style.hoursText} id={day}>{`${hours}`}</Text>
+                        <Text style={styles.dayText}>{day}</Text>
+                        <Text style={styles.hoursText} id={day}>{`${hours}`}</Text>
                     </View> )
                     }
                 )}
@@ -60,19 +77,21 @@ export default function Hours(props) {
 
     const HoursTitleBar = ({styles, name, information}) => {
         const {colors, fonts} = useTheme();
-
         let opened = information.schedule.isOpened(new Date(Date.now()));
         let openedString = `${name} is currently ${opened ? "opened" : "closed"}.`
         return (
             <View accessible={true}
                    accessibilityLabel={openedString}
                     style={{flexDirection: "row", justifyContent: "space-between"}}>
-                <Text style={styles.title}>{`${name}`}</Text>
-                <View
-                    style={{padding: 3, borderRadius: 10, borderWidth: 5, borderColor: opened ? colors.positive : colors.negative, justifyContent: "center"}}>
-                    <Text style={{color: colors.text, fontFamily: fonts.bold}}>
-                        {opened ? "OPEN" : "CLOSED"}
-                    </Text>
+                <Text style={styles.title}>{`${name.trim()}`}</Text>
+                <View style={{justifyContent: "center", flexDirection:"row", flex:.5, alignContent:"center"}}>
+                    <View
+                        style={{padding: 3, justifyContent: "center"}}>
+                        <Text style={{color: styles.title.color, fontFamily: fonts.bold}}>
+                            {opened ? "OPEN" : "CLOSED"}
+                        </Text>
+                    </View>
+                    <View style={styles.openIndicator(opened)}/>
                 </View>
             </View>)
     }
@@ -86,40 +105,40 @@ export default function Hours(props) {
             backgroundColor: colors.card, 
             marginVertical: "2.5%",
             padding: 5,
-        },
-        loadingText: {
-            fontFamily: fonts.bold, 
-            fontSize: 20,
-            color: colors.text,
-        },
-        scrollEnabled: true,
+        }
     };
 
     const [buttonEngaged, setButtonEngaged] = useState(-1);
 
-    const renderHours = ({item, index}) => {
-
+    const HoursButton = ({item, index}) => {
+        const [pressed, setPressed] = useState(false);
+        const sty = styles(pressed);
         return (
-            <Button 
-                styles={{}}
+            <Pressable
+                style={sty.button}
                 onPress={() => {
                     setButtonEngaged(buttonEngaged == index ? -1 : index)
                 }}
-                front={<HoursFront item={item} engaged={index == buttonEngaged} />}
-            />
+                onTouchStart={() => setPressed(true)}
+                onTouchEnd={() => setPressed(false)}
+                onTouchCancel={() => setPressed(false)}
+                accessible={false}
+                >
+                <HoursFront styles={sty.front(buttonEngaged)} item={item} engaged={index == buttonEngaged} />
+            </Pressable>
         )
     }
 
     return (
         <SafeAreaView style={{height:"100%", width:"100%"}}>
-            {{data} &&
+            {data && dataExists &&
                 <ButtonList
                     extraData={buttonEngaged}
                     estimatedItemSize={200}
                     style={normalStyle}
                     sorter={((vals) => vals.sort(([k1, v1],[k2, v2]) => k1.localeCompare(k2)))}
                     data= {data}
-                    renderItem={renderHours}
+                    renderItem={({item, index}) => <HoursButton item={item} index={index}/>}
                     keyExtractor={([key, value]) => key}
                 />}
         </SafeAreaView>

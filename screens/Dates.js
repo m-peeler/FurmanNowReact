@@ -8,7 +8,7 @@ export default function Dates({navigation, pages}) {
         useDataLoadFetchCache(
             "https://cs.furman.edu/~csdaemon/FUNow/importantDateGet.php",
             "DATA:Dates-Cache",
-            async (data) => await data.json()
+            (data) => data
         )
 
     const style = StyleSheet.create({

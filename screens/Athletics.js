@@ -12,9 +12,8 @@ export default function Athletics({navigation, pages}) {
         useDataLoadFetchCache(
             "https://cs.furman.edu/~csdaemon/FUNow/athleticsGet.php",
             "DATA:Athletics-Cache",
-            async (data) => {
-                let results = await data.json();
-                results = results.results.map((item) => {
+            (json) => {
+                results = json.results.map((item) => {
                                 let eventdate = parseDatetime(item.eventdate);
                                 let rtrn = {...item, eventdate: eventdate, allDay: isAllDay(eventdate)};
                                 return rtrn;

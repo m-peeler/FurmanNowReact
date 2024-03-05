@@ -10,7 +10,7 @@ const palette = {
     furmanCompGreen: "#669933",
 
     cloudyPurple: "#E7D6F1",
-    lightPurple: "#BB77FF",
+    lightPurple: "#8442c0",
     midPurple: "#813fb1",
     black: "#110017"
 };

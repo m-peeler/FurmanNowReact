@@ -8,7 +8,7 @@ export default function Health(props) {
         useDataLoadFetchCache(
             "https://cs.furman.edu/~csdaemon/FUNow/healthSafetyGet.php",
             "DATA:Health-Safety-Cache",
-            async (data) => await data.json()
+            (data) => data
         )
 
     const style = StyleSheet.create({

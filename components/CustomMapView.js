@@ -32,18 +32,22 @@ export default function FUNowMapView(props) {
         }
     })
 
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.bounding}>
                 <MapView 
                     style={styles.map}
+                    maxZoomLevel={18}
                     initialRegion={{
                         latitude: 34.925,
                         longitude: -82.440,
                         latitudeDelta: zoom * 0.0012,
                         longitudeDelta: zoom * 0.006
-                }}
-                />
+                }}>
+                    
+                    {props.children}
+                </MapView>
             </View>
         </SafeAreaView>
     )

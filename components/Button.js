@@ -1,4 +1,3 @@
-import { useTheme } from "@react-navigation/native";
 import { useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 
@@ -6,7 +5,6 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 export default function Button(props) {
     const {behind, front, under, onPress, onLongPress, accessibilityLabel, accessibilityHint} = props;
     let {styles, delayLongPress} = props;
-    const {colors, fonts} = useTheme();
     const [pressed, setPressed] = useState(false);
     if (typeof styles === "function") {
         styles = styles(pressed);

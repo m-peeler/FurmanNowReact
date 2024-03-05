@@ -14,7 +14,7 @@ export default function Dining({navigation, pages}) {
         useDataLoadFetchCache(
             "https://cs.furman.edu/~csdaemon/FUNow/dhMenuGet.php",
             "DATA:DH-Dining-Cache",
-            processFetch = async (data) => await data.json()
+            processFetch = (data) => data
         )
 
     const style = StyleSheet.create({
@@ -24,8 +24,7 @@ export default function Dining({navigation, pages}) {
 
     return (
         <SafeAreaView>
-            {(!loading || !fetching) && 
-                
+            {data && data.results &&
                 <Text style={style}>{data.results.map((item) => `${item.meal} \t ${item.station} \t ${item.itemName}\n`)}</Text>}
         </SafeAreaView>
     )
