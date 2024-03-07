@@ -1,23 +1,20 @@
 export default function arrayPartition(arr, partitionOn) {
-    let partitions = {};
+  const partitions = {};
 
-    arr.forEach((element) => {
-        let partitionVal;
+  arr.forEach((element) => {
+    let partitionVal;
 
-        if (typeof partitionOn == "string") {
-            partitionVal = element[partitionOn];
-        } else if (typeof partitionOn == "function") {
-            partitionVal = partitionOn(element);
-        }
+    if (typeof partitionOn === 'string') {
+      partitionVal = element[partitionOn];
+    } else if (typeof partitionOn === 'function') {
+      partitionVal = partitionOn(element);
+    }
 
-        if (partitionVal in partitions) {
-            partitions[partitionVal].push(element);
-        } else {
-            partitions[partitionVal] = [element];
-        }
-    })
-    console.log(partitions);
-    console.log(partitions.true);
-    console.log(partitions["false"]);
-    return partitions;
+    if (partitionVal in partitions) {
+      partitions[partitionVal].push(element);
+    } else {
+      partitions[partitionVal] = [element];
+    }
+  });
+  return partitions;
 }
