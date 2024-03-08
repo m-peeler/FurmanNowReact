@@ -6,7 +6,8 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 import ButtonList from '../components/ButtonList';
-import useBuildingHours, { Schedule } from '../hooks/useBuildingHours.ts';
+import useBuildingHours from '../hooks/useBuildingHours';
+import { Schedule } from '../utilities/Scheduling.ts';
 
 export default function Hours() {
   const styles = (colors, fonts) => (pressed) => StyleSheet.create({

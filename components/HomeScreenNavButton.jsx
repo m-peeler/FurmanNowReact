@@ -9,7 +9,7 @@ import Button from './Button';
 function Icon({ icon }) {
   return (
     <View style={{ alignItems: 'center', justifyItems: 'center' }}>
-      <Image style={{ resizeMode: 'contain' }} source={icon} />
+      <Image style={{ resizeMode: 'contain' }} imageSource={icon} />
     </View>
   );
 }
@@ -33,7 +33,9 @@ export default function HomeScreenNavButton({ styles, onPress, toPage }) {
         </Text>
         )}
       front={(
-        <Icon icon={toPage.icon} />
+        <View>
+          <Icon icon={toPage.icon} />
+        </View>
       )}
       styles={styles.buttonStyles}
       onPress={onPress}
@@ -42,8 +44,11 @@ export default function HomeScreenNavButton({ styles, onPress, toPage }) {
 }
 HomeScreenNavButton.propTypes = ({
   styles: PropTypes.shape({
-    label: PropTypes.shape.isRequired,
-    buttonStyles: PropTypes.shape.isRequired,
+    label: PropTypes.shape().isRequired,
+    buttonStyles: PropTypes.oneOfType([
+      PropTypes.shape().isRequired,
+      PropTypes.func,
+    ]),
   }).isRequired,
   onPress: PropTypes.func.isRequired,
   toPage: PropTypes.instanceOf(Page).isRequired,

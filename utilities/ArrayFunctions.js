@@ -1,5 +1,6 @@
 export default function arrayPartition(arr, partitionOn) {
   const partitions = {};
+  let lenPartitions = 0;
 
   arr.forEach((element) => {
     let partitionVal;
@@ -14,7 +15,8 @@ export default function arrayPartition(arr, partitionOn) {
       partitions[partitionVal].push(element);
     } else {
       partitions[partitionVal] = [element];
+      lenPartitions += 1;
     }
   });
-  return partitions;
+  return lenPartitions > 0 ? partitions : null;
 }

@@ -1,24 +1,54 @@
 import React from 'react';
 import { useTheme } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, Text, View } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
-import ButtonList from '../components/ButtonList';
 import AthleticsButton from '../components/AthleticsButton';
 import { isAllDay, parseDatetime } from '../utilities/DateTimeFunctions';
+import arrayPartition from '../utilities/ArrayFunctions';
+import { dateCompare } from '../utilities/Scheduling.ts';
 
 export default function Athletics() {
   const { colors, fonts } = useTheme();
 
-  const [data, loading, fetching] = useDataLoadFetchCache(
+  const [data] = useDataLoadFetchCache(
     'https://cs.furman.edu/~csdaemon/FUNow/athleticsGet.php',
     'DATA:Athletics-Cache',
     (json) => {
-      const results = json.results.map((item) => {
+      const parsed = json.results.map((item) => {
         const eventdate = parseDatetime(item.eventdate);
         const rtrn = { ...item, eventdate, allDay: isAllDay(eventdate) };
         return rtrn;
       });
-      return results;
+      const today = new Date(Date.now());
+      const tomorrow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+      const partitioned = arrayPartition(parsed, (item) => {
+        const comparedToToday = dateCompare(item.eventdate, today);
+        if (comparedToToday < 0) return 'Results';
+        if (comparedToToday === 0) return 'Today';
+        const comparedToTomorrow = dateCompare(item.eventdate, tomorrow);
+        if (comparedToTomorrow === 0) return 'Tomorrow';
+        return 'This Week';
+      });
+      const compForSort = (a, b) => (a.eventdate > b.eventdate) - (a.eventdate < b.eventdate);
+      let output = [];
+      output = ['Results',
+        ...(partitioned.Results !== undefined
+          ? partitioned.Results.sort(compForSort) : [])];
+      output = [...output,
+        'Today',
+        ...(partitioned.Today !== undefined
+          ? partitioned.Today.sort(compForSort) : [])];
+      output = [...output,
+        'Tomorrow',
+        ...(partitioned.Tomorrow !== undefined
+          ? partitioned.Tomorrow.sort(compForSort) : [])];
+      output = [...output,
+        'This Week',
+        ...(partitioned['This Week'] !== undefined
+          ? partitioned['This Week'].sort(compForSort) : [])];
+      console.log('Output', output);
+      return output;
     },
   );
 
@@ -42,23 +72,25 @@ export default function Athletics() {
 
   return (
     <SafeAreaView>
-      {(!loading || !fetching)
+      {(data !== undefined)
         && (
-        <ButtonList
-          style={normalStyle}
-          estimatedItemSize={73}
-          data={data}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={(item) => (
-            <AthleticsButton
-              // eslint-disable-next-line react/jsx-props-no-spreading
-              {...item}
-            />
-          )}
-          sorter={(vals) => vals.sort(
-            (a, b) => (a.eventdate > b.eventdate) - (a.eventdate < b.eventdate),
-          )}
-        />
+        <View style={normalStyle.bounding}>
+          <FlashList
+            estimatedItemSize={73}
+            data={data}
+            renderItem={({ item }) => {
+              if (typeof item === 'string') {
+                return <Text>{item}</Text>;
+              }
+              return (
+                <AthleticsButton
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                  event={item}
+                />
+              );
+            }}
+          />
+        </View>
         )}
     </SafeAreaView>
   );

@@ -11,7 +11,7 @@ import Navigation from './navigation';
 const customFonts = {
   'Abril Fatface Italic': require('./assets/fonts/Abril_Fatface_Italic.otf'),
   BarlowSCSB: require('./assets/fonts/BarlowSemiCondensed-SemiBold.ttf'),
-  BarlowSC: require('./assets/fonts/BarlowSemiCondensed-Regular.ttf'),
+  BarlowSCR: require('./assets/fonts/BarlowSemiCondensed-Regular.ttf'),
   BarlowSCI: require('./assets/fonts/BarlowSemiCondensed-Italic.ttf'),
   BarlowSCT: require('./assets/fonts/BarlowSemiCondensed-Thin.ttf'),
 };

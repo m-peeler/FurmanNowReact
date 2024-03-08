@@ -167,11 +167,11 @@ function formatAccessibilitySummary(item) {
   return `The ${item.sportTitle} team will play ${location} ${item.opponent} ${formatDatetime(item.eventdate)}.`;
 }
 
-export default function AthleticsButton({ item }) {
+export default function AthleticsButton({ event }) {
   const { colors, fonts } = useTheme();
   const [pressed, setPressed] = useState(false);
   const [status, requestPermissions] = Calendar.useCalendarPermissions();
-  const isHome = item.location_indicator === 'H';
+  const isHome = event.location_indicator === 'H';
   const styles = buttonStyles(colors, fonts, isHome, pressed);
   const internalStyles = frontStyles(colors, fonts, isHome, pressed);
 
@@ -182,34 +182,34 @@ export default function AthleticsButton({ item }) {
       onTouchEnd={() => setPressed(false)}
       onTouchCancel={() => setPressed(false)}
       onLongPress={() => requestAddEvent(
-        setupEventData(item),
+        setupEventData(event),
         status,
         requestPermissions,
       )}
-      accessibilityLabel={formatAccessibilitySummary(item)}
+      accessibilityLabel={formatAccessibilitySummary(event)}
       accessibilityHint="Click for more information."
       style={styles}
     >
       <View style={{ flexDirection: 'row' }}>
-        <Text style={internalStyles.title}>{item.sportTitle}</Text>
+        <Text style={internalStyles.title}>{event.sportTitle}</Text>
         <Text style={internalStyles.versus}>
-          {`${formatOpponent(item)}`}
+          {`${formatOpponent(event)}`}
         </Text>
       </View>
       <View style={{ flexDirection: 'row' }}>
-        {item.noplayText !== ''
-                && <Text style={internalStyles.cancelled}>{item.noplayText}</Text>}
-        {item.resultStatus !== ''
-                && <Text style={internalStyles.victory}>{formatVictoryMessage(item)}</Text>}
-        <Text style={internalStyles.info}>{formatDatetime(item.eventdate)}</Text>
+        {event.noplayText !== ''
+                && <Text style={internalStyles.cancelled}>{event.noplayText}</Text>}
+        {event.resultStatus !== ''
+                && <Text style={internalStyles.victory}>{formatVictoryMessage(event)}</Text>}
+        <Text style={internalStyles.info}>{formatDatetime(event.eventdate)}</Text>
       </View>
     </Pressable>
   );
 }
 AthleticsButton.propTypes = {
-  item: PropTypes.shape({
+  event: PropTypes.shape({
     location_indicator: PropTypes.string.isRequired,
-    eventdate: PropTypes.string.isRequired,
+    eventdate: PropTypes.instanceOf(Date).isRequired,
     noplayText: PropTypes.string.isRequired,
     resultStatus: PropTypes.string.isRequired,
     sportTitle: PropTypes.string.isRequired,

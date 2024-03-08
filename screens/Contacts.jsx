@@ -224,11 +224,8 @@ export default function Contacts() {
               keyExtractor={(item) => item.id.toString()}
               style={normalStyle.bounding}
               renderItem={renderItem(colors, fonts)}
-              sorter={(vals) => {
-                console.log(vals);
-                return vals.sort((a, b) => a.name.localeCompare(b.name))
-                  .sort((a, b) => b.priorityLevel - a.priorityLevel);
-              }}
+              sorter={(vals) => vals.sort((a, b) => a.name.localeCompare(b.name))
+                .sort((a, b) => b.priorityLevel - a.priorityLevel)}
             />
           </SafeAreaView>
           )}

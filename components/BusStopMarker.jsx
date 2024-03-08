@@ -32,7 +32,7 @@ export default function BusStopMarker(props) {
   );
 }
 BusStopMarker.propTypes = {
-  coordinate: PropTypes.shapeOf({
+  coordinate: PropTypes.shape({
     latitude: PropTypes.number.isRequired,
     longitude: PropTypes.number.isRequired,
   }).isRequired,

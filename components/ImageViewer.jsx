@@ -19,6 +19,9 @@ export default function ImageViewer({ imageSource, styles }) {
 ImageViewer.propTypes = {
   imageSource: PropTypes.string.isRequired,
   styles: PropTypes.shape({
-    image: PropTypes.shape.isRequired,
-  }).isRequired,
+    image: PropTypes.shape,
+  }),
+};
+ImageViewer.defaultProps = {
+  styles: defaultStyles,
 };

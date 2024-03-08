@@ -39,8 +39,10 @@ export default function useDataLoadFetchCache(
         const resp = await fetch(fetchFrom);
         const jsonResp = await resp.json();
         const fetched = processFetch(jsonResp);
-        if (fetched != null && fetched !== [] && fetched !== {}) {
-          await setData(fetched);
+        if (fetched != null
+            && (!Array.isArray(fetched) || fetched.length !== 0)
+            && (Object.keys(fetched).length !== 0)) {
+          setData(fetched);
           setFetching(false);
           storeCache(jsonResp);
         }

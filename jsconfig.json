@@ -1,6 +1,5 @@
 {
     "compilerOptions": {},
-    "extends": "expo/jsconfig.base",
     "checkjs": true,
     "javascript": {
         "suggest": {

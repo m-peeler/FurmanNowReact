@@ -44,18 +44,26 @@ Button.propTypes = {
   // If "frontResponsive" is true, styles should be a
   // function that takes in a boolean and yields
   // an object of this shape.
-  styles: PropTypes.shape({
-    button: PropTypes.shape.isRequired,
-    front: PropTypes.shape.isRequired,
-    cells: PropTypes.shape.isRequired,
-  }).isRequired,
+  styles: PropTypes.oneOfType([
+    PropTypes.shape({
+      button: PropTypes.shape,
+      front: PropTypes.shape,
+      cells: PropTypes.shape,
+    }),
+    PropTypes.func,
+  ]),
   frontResponsive: PropTypes.bool,
   behind: PropTypes.node,
-  front: PropTypes.node,
+  front: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
   under: PropTypes.node,
   delayLongPress: PropTypes.number,
 };
 Button.defaultProps = ({
+  styles: {
+    button: { backgroundColor: '#000000' },
+    front: { alignItems: 'center' },
+    behind: { alignItems: 'center' },
+  },
   frontResponsive: false,
   delayLongPress: 500,
   behind: undefined,
