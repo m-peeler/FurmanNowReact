@@ -9,7 +9,10 @@ export default function ButtonList(props) {
   } = props;
   return (
     <View style={style}>
-      <View style={{ borderRadius: style.borderRadius, height: style.height, width: style.width }}>
+      <View style={{
+        borderRadius: 4, margin: '2.5%', height: '97.5%', width: '95%',
+      }}
+      >
         <FlashList
           // eslint-disable-next-line react/jsx-props-no-spreading
           {...rest}
@@ -20,12 +23,18 @@ export default function ButtonList(props) {
   );
 }
 ButtonList.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  data: PropTypes.arrayOf(PropTypes.shape).isRequired,
   sorter: PropTypes.func,
   style: PropTypes.shape({
     borderRadius: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
-    width: PropTypes.number.isRequired,
+    height: PropTypes.oneOfType([
+      PropTypes.number.isRequired,
+      PropTypes.string.isRequired,
+    ]).isRequired,
+    width: PropTypes.oneOfType([
+      PropTypes.number.isRequired,
+      PropTypes.string.isRequired,
+    ]).isRequired,
   }).isRequired,
 };
 ButtonList.defaultProps = {

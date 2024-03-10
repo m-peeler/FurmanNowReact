@@ -11,7 +11,7 @@ export default function BusStopMarker(props) {
       flat
     >
       <View style={{
-        borderColor: color, borderWidth: 5, backgroundColor: '#ffffff', height: 30, width: 30, borderRadius: 20,
+        borderColor: color, borderWidth: 5, backgroundColor: '#ffffff', height: 30, width: 30, borderRadius: 15, justifyContent: 'center', alignContent: 'center',
       }}
       />
       <Callout tooltip>

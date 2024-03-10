@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import useDataLoadFetchCache from './useDataLoadFetchCache';
+import useDataLoadFetchCache, { notEmpty } from './useDataLoadFetchCache';
 import { parseTime } from '../utilities/DateTimeFunctions';
 import * as Scheduling from '../utilities/Scheduling.ts';
 import arrayPartition from '../utilities/ArrayFunctions';
@@ -22,22 +22,19 @@ function sortAndCollateHours(hoursList) {
 }
 
 function joinBuildingInfo(hoursData, buildingData) {
-  if (hoursData === undefined
-    || buildingData === undefined
-    || hoursData.length === 0
-    || buildingData.length === 0) {
+  if (!notEmpty(hoursData) || !notEmpty(buildingData)) {
     return null;
   }
 
-  const collated = hoursData.map(
-    (hours) => sortAndCollateHours(hours),
+  const collated = Object.entries(hoursData).map(
+    ([key, val]) => [key, sortAndCollateHours(val)],
   );
   const joined = collated.map(
-    (hours, index) => [buildingData[index].name,
+    ([key, sched]) => [buildingData[key].name,
       {
-        ...buildingData[index],
-        schedule: hours,
-        lastUpdated: hoursData[index][0].lastUpdated,
+        ...buildingData[key],
+        schedule: sched,
+        lastUpdated: hoursData[key][0].lastUpdated,
       },
     ],
   );
@@ -48,9 +45,7 @@ export default function useBuildingHours() {
   const [hoursData] = useDataLoadFetchCache(
     'https://cs.furman.edu/~csdaemon/FUNow/hoursGet.php',
     'DATA:Building-Hours-Cache',
-    (json) => {
-      arrayPartition(json, 'buildingID');
-    },
+    (json) => arrayPartition(json.results, 'buildingID'),
   );
 
   const [buildingData] = useDataLoadFetchCache(
@@ -71,7 +66,9 @@ export default function useBuildingHours() {
   const [dataExists, setDataExists] = useState(false);
 
   useEffect(() => {
-    if (hoursData === undefined || buildingData === undefined) return;
+    console.log('Lets Go');
+    if (!(notEmpty(hoursData) && notEmpty(buildingData))) return;
+    console.log('Lets Go!');
     const structured = joinBuildingInfo(hoursData, buildingData);
     setData(structured);
     setDataExists(true);

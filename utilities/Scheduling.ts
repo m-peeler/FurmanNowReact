@@ -1,4 +1,4 @@
-enum DaysOfWeek {
+export enum DaysOfWeek {
     MONDAY    = "Monday",
     TUESDAY   = "Tuesday",
     WEDNESDAY  = "Wednesday",
@@ -8,7 +8,7 @@ enum DaysOfWeek {
     SUNDAY    = "Sunday"
  } 
  
- class Schedule {
+ export class Schedule {
  
     static DAYORDER : DaysOfWeek[] = [DaysOfWeek.SUNDAY, DaysOfWeek.MONDAY, DaysOfWeek.TUESDAY, 
       DaysOfWeek.WEDNESDAY, DaysOfWeek.THURSDAY, DaysOfWeek.FRIDAY, DaysOfWeek.SATURDAY,]
@@ -125,7 +125,7 @@ enum DaysOfWeek {
     } 
  }
  
- class HourRange {
+ export class HourRange {
     start : Date
     end : Date
     constructor(start : Date, end : Date) {
@@ -191,7 +191,7 @@ export function datetimeCompare (first : Date, second : Date) {
     return timeCompare(first, second);
 }
 
-const timeCompare = (timeA : Date, timeB : Date) : number => {
+export const timeCompare = (timeA : Date, timeB : Date) : number => {
   if (timeA == null && timeB == null) return 0;
   if (timeA == null) return -1;
   if (timeB == null) return 1;
@@ -217,5 +217,6 @@ const timeCompare = (timeA : Date, timeB : Date) : number => {
       return monthDiff > 0 ? 1 : -1;
     }
     const dayDiff = first.getDate() - second.getDate();
+    if (dayDiff === 0) return 0;
     return dayDiff > 0 ? 1 : -1;
   }

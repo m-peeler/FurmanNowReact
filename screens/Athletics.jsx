@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTheme } from '@react-navigation/native';
-import { SafeAreaView, Text, View } from 'react-native';
+import { SafeAreaView, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
-import AthleticsButton from '../components/AthleticsButton';
+import AthleticsButton, { AthleticsHeading } from '../components/AthleticsButton';
 import { isAllDay, parseDatetime } from '../utilities/DateTimeFunctions';
 import arrayPartition from '../utilities/ArrayFunctions';
 import { dateCompare } from '../utilities/Scheduling.ts';
@@ -21,10 +21,10 @@ export default function Athletics() {
         return rtrn;
       });
       const today = new Date(Date.now());
-      const tomorrow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
       const partitioned = arrayPartition(parsed, (item) => {
         const comparedToToday = dateCompare(item.eventdate, today);
-        if (comparedToToday < 0) return 'Results';
+        if (comparedToToday < 0 || item.resultStatus !== '') return 'Results';
         if (comparedToToday === 0) return 'Today';
         const comparedToTomorrow = dateCompare(item.eventdate, tomorrow);
         if (comparedToTomorrow === 0) return 'Tomorrow';
@@ -32,27 +32,30 @@ export default function Athletics() {
       });
       const compForSort = (a, b) => (a.eventdate > b.eventdate) - (a.eventdate < b.eventdate);
       let output = [];
-      output = ['Results',
+      // If there are elements in it, adds each sorted
+      // list (prefixed by its header) to the output list
+      output = [
         ...(partitioned.Results !== undefined
-          ? partitioned.Results.sort(compForSort) : [])];
-      output = [...output,
-        'Today',
+          ? [{ heading: 'RESULTS' },
+            ...partitioned.Results.sort(compForSort)]
+          : []),
         ...(partitioned.Today !== undefined
-          ? partitioned.Today.sort(compForSort) : [])];
-      output = [...output,
-        'Tomorrow',
+          ? [{ heading: 'TODAY', date: today },
+            ...partitioned.Today.sort(compForSort)]
+          : []),
         ...(partitioned.Tomorrow !== undefined
-          ? partitioned.Tomorrow.sort(compForSort) : [])];
-      output = [...output,
-        'This Week',
+          ? [{ heading: 'TOMORROW', date: tomorrow },
+            ...partitioned.Tomorrow.sort(compForSort)]
+          : []),
         ...(partitioned['This Week'] !== undefined
-          ? partitioned['This Week'].sort(compForSort) : [])];
-      console.log('Output', output);
+          ? [{ heading: 'THIS WEEK' },
+            ...partitioned['This Week'].sort(compForSort)]
+          : [])];
       return output;
     },
   );
 
-  const normalStyle = {
+  const style = {
     bounding: {
       alignSelf: 'center',
       height: '97%',
@@ -67,24 +70,27 @@ export default function Athletics() {
       fontSize: 20,
       color: colors.text,
     },
-    scrollEnabled: true,
   };
 
   return (
     <SafeAreaView>
       {(data !== undefined)
         && (
-        <View style={normalStyle.bounding}>
+        <View style={style.bounding}>
           <FlashList
             estimatedItemSize={73}
             data={data}
             renderItem={({ item }) => {
-              if (typeof item === 'string') {
-                return <Text>{item}</Text>;
+              if ('heading' in item) {
+                return (
+                  <AthleticsHeading
+                    heading={item.heading}
+                    date={item.date}
+                  />
+                );
               }
               return (
                 <AthleticsButton
-                // eslint-disable-next-line react/jsx-props-no-spreading
                   event={item}
                 />
               );

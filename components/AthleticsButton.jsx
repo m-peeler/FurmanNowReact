@@ -5,7 +5,7 @@ import {
 import * as Calendar from 'expo-calendar';
 import { useTheme } from '@react-navigation/native';
 import PropTypes from 'prop-types';
-import { isAllDay, addToCalendar } from '../utilities/DateTimeFunctions';
+import { isAllDay, addToCalendar, getDateSuffix } from '../utilities/DateTimeFunctions';
 
 function locIndText(locationIndicator) {
   switch (locationIndicator) {
@@ -24,6 +24,8 @@ function formatVictoryMessage(item) {
       return `Loss: ${item.resultUs} to ${item.resultThem}`;
     case 'W':
       return `Win: ${item.resultUs} to ${item.resultThem}`;
+    case 'N':
+      return 'Unknown';
     default:
       return `${item.resultUs}-${item.resultThem}`;
   }
@@ -94,6 +96,8 @@ function frontStyles(colors, fonts, home, pressed) {
       fontFamily: fonts.bold,
       fontSize: 24,
       color: sty.color,
+      textAlign: 'left',
+      alignSelf: 'flex-end',
     },
     versus: {
       flex: 2,
@@ -130,11 +134,10 @@ function frontStyles(colors, fonts, home, pressed) {
 
 function formatDatetime(date) {
   if (date === undefined) {
-    console.log('Hello', date);
     return '';
   }
-  const month = date.toLocaleDateString('default', { month: 'short' });
-  const weekday = date.toLocaleDateString('default', { weekday: 'short' });
+  const month = date.toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'short' });
+  const weekday = date.toLocaleDateString('en-US', { timeZone: 'America/New_York', weekday: 'short' });
   let time;
   if (isAllDay(date)) {
     time = 'All Day';
@@ -157,10 +160,14 @@ function formatAccessibilitySummary(item) {
       victStatus = 'won';
     } else if (item.resultStatus === 'L') {
       victStatus = 'lost';
+    } else if (item.resultStatus === 'N') {
+      victStatus = 'played';
     } else {
       victStatus = 'drew';
     }
-    return `The ${item.sportTitle} team ${victStatus} ${location} ${item.opponent}, with a final score of Furman ${item.resultUs} to ${item.opponent} ${item.resultThem}`;
+    const results = `The ${item.sportTitle} team ${victStatus} ${location} ${item.opponent}`;
+    if (item.resultStatus === 'N') return results;
+    return `${results}, with a final score of Furman ${item.resultUs} to ${item.opponent} ${item.resultThem}`;
   } if (item.noplayText !== '') {
     return `The ${item.sportTitle} game ${location} ${item.opponent} was ${item.noplayText}.`;
   }
@@ -175,6 +182,9 @@ export default function AthleticsButton({ event }) {
   const styles = buttonStyles(colors, fonts, isHome, pressed);
   const internalStyles = frontStyles(colors, fonts, isHome, pressed);
 
+  let bottomLeftDisplay = event.location_indicator === 'H' ? 'Home' : undefined;
+  bottomLeftDisplay = event.resultStatus !== '' ? 'Result' : bottomLeftDisplay;
+  bottomLeftDisplay = event.noplayText !== '' ? 'Noplay' : bottomLeftDisplay;
   return (
     <Pressable
       frontResponsive
@@ -197,10 +207,12 @@ export default function AthleticsButton({ event }) {
         </Text>
       </View>
       <View style={{ flexDirection: 'row' }}>
-        {event.noplayText !== ''
-                && <Text style={internalStyles.cancelled}>{event.noplayText}</Text>}
-        {event.resultStatus !== ''
-                && <Text style={internalStyles.victory}>{formatVictoryMessage(event)}</Text>}
+        {bottomLeftDisplay === 'Noplay'
+          && <Text style={internalStyles.cancelled}>{event.noplayText}</Text>}
+        {bottomLeftDisplay === 'Result'
+          && <Text style={internalStyles.victory}>{formatVictoryMessage(event)}</Text>}
+        {bottomLeftDisplay === 'Home'
+          && <Text style={internalStyles.victory}>Home Game!</Text>}
         <Text style={internalStyles.info}>{formatDatetime(event.eventdate)}</Text>
       </View>
     </Pressable>
@@ -214,4 +226,63 @@ AthleticsButton.propTypes = {
     resultStatus: PropTypes.string.isRequired,
     sportTitle: PropTypes.string.isRequired,
   }).isRequired,
+};
+
+function formatDate(date) {
+  const month = date.toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'long' });
+  const suffix = getDateSuffix(date);
+  return `${month} ${date.getDate()}${suffix}, ${date.getFullYear()}`;
+}
+
+export function AthleticsHeading({ heading, date }) {
+  const { colors, fonts } = useTheme();
+
+  const style = {
+    heading: {
+      fontFamily: fonts.heading,
+      fontSize: 28,
+      color: colors.text,
+      flex: 2,
+    },
+    headingDate: {
+      fontFamily: fonts.italic,
+      fontSize: 18,
+      color: colors.text,
+      textAlign: 'right',
+    },
+    bounding: {
+      paddingTop: 4,
+      paddingHorizontal: 10,
+      alignContent: 'space-between',
+      flexDirection: 'row',
+      backgroundColor: colors.notification,
+      borderRadius: 2,
+    },
+  };
+
+  return (
+    <View
+      style={style.bounding}
+      accessible
+      accessibilityLabel={`${heading}, section heading`}
+      accessibilityHint={
+        `Beginning of section for ${heading !== 'Results' ? 'events happening' : ''} ${heading}`
+      }
+    >
+      <Text style={style.heading}>{heading}</Text>
+      {(date !== undefined)
+        && (
+        <View style={{ justifyContent: 'flex-end', flex: 1, marginBottom: 4 }}>
+          <Text style={style.headingDate}>{formatDate(date)}</Text>
+        </View>
+        )}
+    </View>
+  );
+}
+AthleticsHeading.propTypes = {
+  heading: PropTypes.string.isRequired,
+  date: PropTypes.instanceOf(Date),
+};
+AthleticsHeading.defaultProps = {
+  date: undefined,
 };

@@ -4,6 +4,47 @@ import { SafeAreaView, StyleSheet, View } from 'react-native';
 import MapView from 'react-native-maps';
 import PropTypes from 'prop-types';
 
+// Uses the Google Maps JSON configs to disable various
+// points of interest from being shown on the map; 
+// Effectively doubles up on the 'showPointsOfInterest'
+// being false.
+const removePOIs = [
+  {
+    featureType: 'administrative',
+    elementType: 'geometry',
+    stylers: [
+      {
+        visibility: 'off',
+      },
+    ],
+  },
+  {
+    featureType: 'poi',
+    stylers: [
+      {
+        visibility: 'off',
+      },
+    ],
+  },
+  {
+    featureType: 'road',
+    elementType: 'labels.icon',
+    stylers: [
+      {
+        visibility: 'off',
+      },
+    ],
+  },
+  {
+    featureType: 'transit',
+    stylers: [
+      {
+        visibility: 'off',
+      },
+    ],
+  },
+];
+
 export default function FUNowMapView(props) {
   const { colors } = useTheme();
   const { children } = props;
@@ -49,6 +90,8 @@ export default function FUNowMapView(props) {
             latitudeDelta: zoom * 0.0012,
             longitudeDelta: zoom * 0.006,
           }}
+          showsPointsOfInterest={false}
+          customMapStyle={removePOIs}
         >
 
           {children}

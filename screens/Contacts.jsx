@@ -202,7 +202,6 @@ export default function Contacts() {
   };
 
   const [data, fetching, loading] = useContacts();
-
   return (
     <View style={{ flex: 1, paddingBottom: 38 + 60 }}>
       {(fetching && loading)

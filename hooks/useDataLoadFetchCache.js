@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+export function notEmpty(data) {
+  return data !== undefined && (!Array.isArray(data) || data.length !== 0)
+  && (!(typeof data === 'object' && !Array.isArray(data) && data !== null) || Object.keys(data).length !== 0);
+}
+
 export default function useDataLoadFetchCache(
   fetchFrom,
   cacheTo,
@@ -16,12 +21,13 @@ export default function useDataLoadFetchCache(
     const processedLoad = async () => {
       try {
         const cache = await AsyncStorage.getItem(cacheTo);
-        const parsed = processFetch(JSON.parse(cache));
-        if (parsed && discardCache(parsed)) {
+        const parsed = await JSON.parse(cache);
+        const processed = processFetch(parsed);
+        if (processed && discardCache(processed)) {
           AsyncStorage.removeItem(cacheTo)
             .catch((e) => console.log(e));
-        } else if (fetching && parsed.length !== 0) {
-          setData(parsed);
+        } else if (notEmpty(processed)) {
+          setData(processed);
           setLoading(false);
         }
       } catch (e) {
@@ -38,10 +44,9 @@ export default function useDataLoadFetchCache(
       try {
         const resp = await fetch(fetchFrom);
         const jsonResp = await resp.json();
+        if (jsonResp === null) return;
         const fetched = processFetch(jsonResp);
-        if (fetched != null
-            && (!Array.isArray(fetched) || fetched.length !== 0)
-            && (Object.keys(fetched).length !== 0)) {
+        if (notEmpty(fetched)) {
           setData(fetched);
           setFetching(false);
           storeCache(jsonResp);
@@ -58,7 +63,7 @@ export default function useDataLoadFetchCache(
   }, []);
 
   useEffect(() => {
-    setExists(true);
+    setExists(!loading || !fetching);
   }, [loading, fetching]);
 
   return [data, loading, fetching, exists];

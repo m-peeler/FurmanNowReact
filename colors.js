@@ -36,8 +36,8 @@ const DefaultTheme = {
   colors: {
     ...CommonTheme.colors,
     primary: palette.midPurple,
-    background: palette.furmanWhite,
-    card: palette.cloudyPurple,
+    background: palette.cloudyPurple,
+    card: palette.furmanWhite,
     text: palette.black,
     accentCard: palette.lightPurple,
     accentText: palette.furmanPurple,

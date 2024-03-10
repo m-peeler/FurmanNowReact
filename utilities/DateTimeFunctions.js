@@ -36,6 +36,15 @@ export function isAllDay(date) {
   return rtrn;
 }
 
+export function getDateSuffix(date) {
+  const day = date.getDate();
+  if (day > 3 && day < 21) { return 'th'; }
+  if (day % 10 === 1) { return 'st'; }
+  if (day % 10 === 2) { return 'nd'; }
+  if (day % 10 === 3) { return 'rd'; }
+  return 'th';
+}
+
 const directToSettings = () => {
   Alert.alert(
     'No Calendar Permissions',

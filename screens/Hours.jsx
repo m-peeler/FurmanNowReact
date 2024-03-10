@@ -9,57 +9,57 @@ import ButtonList from '../components/ButtonList';
 import useBuildingHours from '../hooks/useBuildingHours';
 import { Schedule } from '../utilities/Scheduling.ts';
 
-export default function Hours() {
-  const styles = (colors, fonts) => (pressed) => StyleSheet.create({
-    locationText: {
-      title: {
-        fontFamily: fonts.bold,
-        color: pressed ? colors.notificationText : colors.text,
-        fontSize: 24,
-        flex: 2,
-        flexGrow: 1,
-      },
-      openIndicator: (opened) => {
-        let background;
-        if (pressed) {
-          background = colors.notificationText;
-        } else if (opened) {
-          background = colors.positive;
-        } else {
-          background = colors.negative;
-        }
-        return {
-          alignSelf: 'center',
-          borderRadius: 10,
-          height: 20,
-          width: 20,
-          margin: 5,
-          backgroundColor: background,
-        };
-      },
-      dayText: {
-        fontFamily: fonts.regular,
-        color: pressed ? colors.notificationText : colors.text,
-        fontSize: 18,
-        paddingLeft: 10,
-        paddingVertical: 0,
-        flex: 1,
-      },
-      hoursText: {
-        fontFamily: fonts.thin,
-        color: pressed ? colors.notificationText : colors.text,
-        fontSize: 18,
-        paddingRight: 10,
-        paddingVertical: 0,
-        flex: 2,
-        textAlign: 'right',
-      },
+const buttonStyl = (colors, fonts) => (pressed) => StyleSheet.create({
+  locationText: {
+    title: {
+      fontFamily: fonts.bold,
+      color: pressed ? colors.notificationText : colors.text,
+      fontSize: 24,
+      flex: 2,
+      flexGrow: 1,
     },
-    button: {
-      backgroundColor: pressed ? colors.notification : colors.card,
+    openIndicator: (opened) => {
+      let background;
+      if (pressed) {
+        background = colors.notificationText;
+      } else if (opened) {
+        background = colors.positive;
+      } else {
+        background = colors.negative;
+      }
+      return {
+        alignSelf: 'center',
+        borderRadius: 10,
+        height: 20,
+        width: 20,
+        margin: 5,
+        backgroundColor: background,
+      };
     },
-  });
+  },
+  button: {
+    backgroundColor: pressed ? colors.notification : colors.card,
+  },
+  dayText: {
+    fontFamily: fonts.regular,
+    color: pressed ? colors.notificationText : colors.text,
+    fontSize: 18,
+    paddingLeft: 10,
+    paddingVertical: 0,
+    flex: 1,
+  },
+  hoursText: {
+    fontFamily: fonts.thin,
+    color: pressed ? colors.notificationText : colors.text,
+    fontSize: 18,
+    paddingRight: 10,
+    paddingVertical: 0,
+    flex: 2,
+    textAlign: 'right',
+  },
+});
 
+export default function Hours() {
   const { colors, fonts } = useTheme();
   const [data, dataExists] = useBuildingHours();
 
@@ -67,14 +67,13 @@ export default function Hours() {
 
   const normalStyle = {
     alignSelf: 'center',
+    alignItems: 'center',
     height: '97%',
     width: '95%',
     borderRadius: 10,
     backgroundColor: colors.card,
     marginVertical: '2.5%',
-    padding: 5,
   };
-
   return (
     <SafeAreaView style={{ height: '100%', width: '100%' }}>
       {data && dataExists
@@ -89,7 +88,7 @@ export default function Hours() {
             <HoursButton
               item={item}
               index={index}
-              styles={styles(colors, fonts, buttonEngaged)}
+              styles={buttonStyl(colors, fonts)}
               onPress={() => {
                 setButtonEngaged(buttonEngaged === index ? -1 : index);
               }}
@@ -140,19 +139,22 @@ function HoursButton({
   );
 }
 HoursButton.propTypes = {
-  item: PropTypes.arrayOf([
-    PropTypes.string.isRequired,
+  item: PropTypes.arrayOf(
+    PropTypes.string,
     PropTypes.shape({
       schedule: PropTypes.instanceOf(Schedule).isRequired,
-    }).isRequired,
-  ]).isRequired,
+    }),
+  ).isRequired,
   index: PropTypes.string.isRequired,
   onPress: PropTypes.func.isRequired,
-  styles: PropTypes.shape({
-    locationText: PropTypes.shape.isRequired,
-    dayText: PropTypes.shape.isRequired,
-    hoursText: PropTypes.shape.isRequired,
-  }).isRequired,
+  styles: PropTypes.oneOfType([
+    PropTypes.shape({
+      locationText: PropTypes.shape.isRequired,
+      dayText: PropTypes.shape.isRequired,
+      hoursText: PropTypes.shape.isRequired,
+    }).isRequired,
+    PropTypes.func,
+  ]).isRequired,
   buttonEngaged: PropTypes.string.isRequired,
 };
 
@@ -168,7 +170,7 @@ function HoursTitleBar({ styles, name, information }) {
     >
       <Text style={styles.title}>{`${name.trim()}`}</Text>
       <View style={{
-        justifyContent: 'center', flexDirection: 'row', flex: 0.5, alignContent: 'center',
+        justifyContent: 'flex-end', flexDirection: 'row', flex: 0.5, alignContent: 'center',
       }}
       >
         <View
@@ -183,7 +185,6 @@ function HoursTitleBar({ styles, name, information }) {
     </View>
   );
 }
-
 HoursTitleBar.propTypes = {
   information: PropTypes.shape({
     schedule: PropTypes.instanceOf(Schedule),
