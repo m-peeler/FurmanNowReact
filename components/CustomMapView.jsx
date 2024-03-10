@@ -5,7 +5,7 @@ import MapView from 'react-native-maps';
 import PropTypes from 'prop-types';
 
 // Uses the Google Maps JSON configs to disable various
-// points of interest from being shown on the map; 
+// points of interest from being shown on the map;
 // Effectively doubles up on the 'showPointsOfInterest'
 // being false.
 const removePOIs = [

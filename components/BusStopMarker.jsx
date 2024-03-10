@@ -4,7 +4,9 @@ import { Text, View } from 'react-native';
 import PropTypes from 'prop-types';
 
 export default function BusStopMarker(props) {
-  const { title, color, coordinate } = props;
+  const {
+    title, eta, color, coordinate,
+  } = props;
   return (
     <Marker
       coordinate={coordinate}
@@ -38,8 +40,10 @@ BusStopMarker.propTypes = {
   }).isRequired,
   color: PropTypes.string,
   title: PropTypes.string,
+  eta: PropTypes.number,
 };
 BusStopMarker.defaultProps = {
   color: '#000000',
   title: '',
+  eta: undefined,
 };

@@ -25,7 +25,6 @@ function colorByCat(category) {
 export default function BusStopMarker({
   coordinate, name, nickname, locationText, category, hasHours, buildingID,
 }) {
-  const textPos = (coordinate.latitude * 4) % 4;
   return (
     <Marker coordinate={coordinate} title={name} description={locationText !== undefined ? locationText : ''}>
       <View style={{ flexDirection: 'column' }}>
