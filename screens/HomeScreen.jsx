@@ -10,6 +10,7 @@ import PropTypes from 'prop-types';
 import HomeScreenNavButton from '../components/HomeScreenNavButton';
 import Button from '../components/Button';
 import Page from '../utilities/Page';
+import Weather from '../components/Weather';
 
 function renderResponsiveLabel(text) {
   return function respLabCurried(style) {
@@ -84,46 +85,9 @@ export default function HomeScreen(props) {
   const { params } = route;
   const { pages } = params;
 
-  const styles = StyleSheet.create({
-    container: {
-      backgroundColor: colors.background,
-      alignItems: 'center',
-    },
-    headings: {
-      fontSize: 18,
-      textAlign: 'center',
-      color: colors.text,
-      alignContent: 'center',
-      justifyContent: 'center',
-    },
-    weather: {
-      flexDirection: 'row',
-      backgroundColor: colors.card,
-      alignSelf: 'flex-start',
-      alignContent: 'center',
-      justifyContent: 'center',
-      borderBottomRightRadius: 15,
-      borderBottomLeftRadius: 15,
-      top: -10,
-      width: '100%',
-      height: (displayableHeight / 7) * 2,
-    },
-  });
-
   return (
     <SafeAreaView style={{ flex: 1, flexDirection: 'column' }}>
-      <View style={styles.weather}>
-        <Text style={{
-          alignSelf: 'flex-end',
-          fontFamily: fonts.bold,
-          paddingBottom: 10,
-          fontSize: 20,
-          color: buttonTextColor(false),
-        }}
-        >
-          WEATHER
-        </Text>
-      </View>
+      <Weather height={(displayableHeight / 7) * 2} width="100%" />
       <View style={{ height: (displayableHeight / 7) * 4 }} />
       <View style={{ alignSelf: 'flex-end', height: displayableHeight / 7, width: '100%' }}>
         <Button
