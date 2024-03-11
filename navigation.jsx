@@ -27,7 +27,6 @@ const pages = [
   [new Page(4, 'Dining', { category: catHome }), Dining],
   [new Page(41, 'Dining-More-Info', { showName: false }), Blank],
   [new Page(5, 'Events', { category: catHome }), Events],
-  [new Page(51, 'Events-More-Info', { showName: false }), Blank],
   [new Page(6, 'Map', { category: catHome }), Map],
   [new Page(7, 'Health', { category: catHome }), Health],
   [new Page(8, 'Dates', { category: catHome }), Dates],
