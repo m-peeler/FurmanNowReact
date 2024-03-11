@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, Pressable,
+  Linking,
 } from 'react-native';
 import * as Calendar from 'expo-calendar';
 import { useTheme } from '@react-navigation/native';
@@ -185,6 +186,11 @@ export default function AthleticsButton({ event }) {
         status,
         requestPermissions,
       )}
+      onPress={() => {
+        if (event.url !== '' && event.url !== 'nullc') {
+          Linking.openURL(`https://furmanpaladins.com/${event.url}`);
+        }
+      }}
       accessibilityLabel={formatAccessibilitySummary(event)}
       accessibilityHint="Click for more information."
       style={styles}
@@ -214,6 +220,7 @@ AthleticsButton.propTypes = {
     noplayText: PropTypes.string.isRequired,
     resultStatus: PropTypes.string.isRequired,
     sportTitle: PropTypes.string.isRequired,
+    url: PropTypes.string,
   }).isRequired,
 };
 

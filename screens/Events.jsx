@@ -110,7 +110,12 @@ function EventButton({
         >
           {`Located in ${location}`}
         </Text>
-        <Text style={{ color: textColor, fontFamily: fonts.regular, fontSize: 14 }}>{`\t${description}`}</Text>
+        <Text style={{
+          color: textColor, fontFamily: fonts.regular, fontSize: 14,
+        }}
+        >
+          {`\t${description}`}
+        </Text>
         <Text style={{
           textAlign: 'center', color: textColor, fontFamily: fonts.italic, fontSize: 16,
         }}

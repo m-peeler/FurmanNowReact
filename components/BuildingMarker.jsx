@@ -1,6 +1,7 @@
 import React from 'react';
 import { Callout, Marker } from 'react-native-maps';
 import { Text, View } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import PropTypes from 'prop-types';
 
 function colorByCat(category) {
@@ -25,6 +26,7 @@ function colorByCat(category) {
 export default function BusStopMarker({
   coordinate, name, nickname, locationText, category, hasHours, buildingID,
 }) {
+  const {colors, fonts} = useTheme();
   return (
     <Marker coordinate={coordinate} title={name} description={locationText !== undefined ? locationText : ''}>
       <View style={{ flexDirection: 'column' }}>
@@ -51,8 +53,10 @@ export default function BusStopMarker({
           >
             <View style={{ paddingHorizontal: 10, paddingVertical: 5, flex: 1 }}>
               <Text style={{ color: 'black', fontSize: 20, flex: 1 }}>
-                {name}
+                {nickname || name}
               </Text>
+              {nickname
+                && (<Text style={{ color: 'black', fontSize: 12, fontFamily: fonts.italic }}>{name}</Text>)}
               <Text style={{ color: 'black', fontSize: 15 }}>{locationText !== undefined ? locationText : ''}</Text>
             </View>
           </View>

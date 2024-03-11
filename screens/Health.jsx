@@ -19,7 +19,7 @@ export default function Health() {
   return (
     <SafeAreaView>
       {(!loading || !fetching)
-        && <Text style={style}>{data.results.map((item) => `${item.name} \t ${item.content}\n`)}</Text>}
+        && <Text style={style}>{data.map((item) => `${item.name} \t ${item.content}\n`)}</Text>}
     </SafeAreaView>
   );
 }
