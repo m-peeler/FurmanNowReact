@@ -6,15 +6,20 @@ import PropTypes from 'prop-types';
 import Page from '../utilities/Page';
 import Button from './Button';
 
-function Icon({ icon }) {
+const renderFront = (sourceImage) => function (style) {
+  return <Icon sourceImage={sourceImage} style={style} />;
+};
+
+function Icon({ style, sourceImage }) {
   return (
-    <View style={{ alignItems: 'center', justifyItems: 'center' }}>
-      <Image style={{ resizeMode: 'contain' }} imageSource={icon} />
+    <View style={{ alignItems: 'center' }}>
+      <Image style={style.icon} source={sourceImage} />
     </View>
   );
 }
 Icon.propTypes = {
-  icon: PropTypes.string.isRequired,
+  style: PropTypes.shape().isRequired,
+  sourceImage: PropTypes.number.isRequired,
 };
 
 export default function HomeScreenNavButton({ styles, onPress, toPage }) {
@@ -27,16 +32,12 @@ export default function HomeScreenNavButton({ styles, onPress, toPage }) {
           accessible
           accessibilityLabel={`${toPage.name}, title`}
           style={styles.label}
-          zIndex={1}
         >
-          {toPage.name.toUpperCase()}
+          {toPage.name}
         </Text>
         )}
-      front={(
-        <View>
-          <Icon icon={toPage.icon} />
-        </View>
-      )}
+      front={renderFront(toPage.icon)}
+      frontResponsive
       styles={styles.buttonStyles}
       onPress={onPress}
     />

@@ -13,23 +13,31 @@ import Health from './screens/Health';
 import Map from './screens/Map';
 import Dining from './screens/Dining';
 import Page from './utilities/Page';
+import SMARTPHONE from './assets/icon/icon-phone.png';
+import CLOCK from './assets/icon/icon-clock.png';
+import BASKETBALL from './assets/icon/icon-basketball.png';
+import EVENTS from './assets/icon/icon-events.png';
+import MAP from './assets/icon/icon-map.png';
+import DATES from './assets/icon/icon-dates.png';
+import CADUCEUS from './assets/icon/icon-health.png';
+import FOOD from './assets/icon/icon-food.png';
 
 const Stack = createNativeStackNavigator();
 
 const catHome = 'Home Screen';
 const catNews = 'News Sources';
 const pages = [
-  [new Page(1, 'Contact', { category: catHome }), Contacts],
-  [new Page(2, 'Athletics', { category: catHome }), Athletics],
+  [new Page(1, 'Contact', { category: catHome, icon: SMARTPHONE }), Contacts],
+  [new Page(2, 'Athletics', { category: catHome, icon: BASKETBALL }), Athletics],
   [new Page(21, 'Athletics-More-Info', { showName: false }), Blank],
-  [new Page(3, 'Hours', { category: catHome }), Hours],
+  [new Page(3, 'Hours', { category: catHome, icon: CLOCK }), Hours],
   [new Page(31, 'Hours-More-Info', { showName: false }), Blank],
-  [new Page(4, 'Dining', { category: catHome }), Dining],
+  [new Page(4, 'Dining', { category: catHome, icon: FOOD }), Dining],
   [new Page(41, 'Dining-More-Info', { showName: false }), Blank],
-  [new Page(5, 'Events', { category: catHome }), Events],
-  [new Page(6, 'Map', { category: catHome }), Map],
-  [new Page(7, 'Health', { category: catHome }), Health],
-  [new Page(8, 'Dates', { category: catHome }), Dates],
+  [new Page(5, 'Events', { category: catHome, icon: EVENTS }), Events],
+  [new Page(6, 'Map', { category: catHome, icon: MAP }), Map],
+  [new Page(7, 'Health', { category: catHome, icon: CADUCEUS }), Health],
+  [new Page(8, 'Dates', { category: catHome, icon: DATES }), Dates],
 
   [new Page(101, 'The Paladin', { category: catNews }), Blank],
   [new Page(102, 'FUNC', { category: catNews }), Blank],

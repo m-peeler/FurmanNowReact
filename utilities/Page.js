@@ -1,4 +1,4 @@
-const defaultIcon = '../assets/images/icons/belltowerx1.png';
+const defaultIcon = require('../assets/images/icons/belltowerx1.png');
 
 export default class Page {
   constructor(id, name, { icon = defaultIcon, category = 'None', showName = true }) {

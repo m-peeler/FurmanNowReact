@@ -29,6 +29,7 @@ export default function HomeScreen(props) {
   function buttonTextColor(pressed) {
     return pressed ? colors.notificationText : colors.text;
   }
+  const buttonSize = (windowHeight / 7) * 0.8;
 
   const buttonStyles = StyleSheet.create({
     label: {
@@ -41,8 +42,8 @@ export default function HomeScreen(props) {
     },
     buttonStyles: (pressed) => ({
       button: {
-        width: (windowHeight / 7) * 0.8,
-        height: (windowHeight / 7) * 0.8,
+        width: buttonSize,
+        height: buttonSize,
         backgroundColor: buttonColor(pressed),
         color: buttonTextColor(pressed),
         borderRadius: 10,
@@ -51,6 +52,14 @@ export default function HomeScreen(props) {
         flex: 1,
         width: '33.333%',
         alignItems: 'center',
+      },
+      front: {
+        icon: {
+          width: (buttonSize * 2) / 3,
+          height: (buttonSize * 2) / 3,
+          top: buttonSize / 6,
+          tintColor: pressed ? colors.notificationText : colors.text,
+        },
       },
     }),
   });
