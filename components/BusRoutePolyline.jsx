@@ -17,6 +17,7 @@ export default function BusRoutePolyline({ color, route, stops }) {
         name, latitude, longitude, eta,
       }) => (
         <BusStopMarker
+          key={name}
           title={name}
           color={color}
           eta={eta}

@@ -10,7 +10,6 @@ import Dates from './screens/Dates';
 import Athletics from './screens/Athletics';
 import Hours from './screens/Hours';
 import Health from './screens/Health';
-import Transit from './screens/Transit';
 import Map from './screens/Map';
 import Dining from './screens/Dining';
 import Page from './utilities/Page';
@@ -30,9 +29,8 @@ const pages = [
   [new Page(5, 'Events', { category: catHome }), Events],
   [new Page(51, 'Events-More-Info', { showName: false }), Blank],
   [new Page(6, 'Map', { category: catHome }), Map],
-  [new Page(7, 'Transit', { category: catHome }), Transit],
-  [new Page(8, 'Health', { category: catHome }), Health],
-  [new Page(9, 'Dates', { category: catHome }), Dates],
+  [new Page(7, 'Health', { category: catHome }), Health],
+  [new Page(8, 'Dates', { category: catHome }), Dates],
 
   [new Page(101, 'The Paladin', { category: catNews }), Blank],
   [new Page(102, 'FUNC', { category: catNews }), Blank],

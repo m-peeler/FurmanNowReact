@@ -139,3 +139,14 @@ export async function addToCalendar(event, status, requestPermissions, calendarN
     console.log(e);
   }
 }
+
+export function requestAddEvent(event, status, requestPermissions) {
+  Alert.alert(
+    'Add Event?',
+    `Would you like to add ${event.title} to your calendar?`,
+    [
+      { text: 'Cancel', onPress: () => {} },
+      { text: 'Ok', onPress: () => addToCalendar(event, status, requestPermissions), isPreferred: true },
+    ],
+  );
+}

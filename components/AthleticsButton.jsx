@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, Alert, Pressable,
+  View, Text, StyleSheet, Pressable,
 } from 'react-native';
 import * as Calendar from 'expo-calendar';
 import { useTheme } from '@react-navigation/native';
 import PropTypes from 'prop-types';
-import { isAllDay, addToCalendar, getDateSuffix } from '../utilities/DateTimeFunctions';
+import { isAllDay, requestAddEvent, getDateSuffix } from '../utilities/DateTimeFunctions';
 
 function locIndText(locationIndicator) {
   switch (locationIndicator) {
@@ -54,17 +54,6 @@ function setupEventData(item) {
     availability: Calendar.Availability.BUSY,
   };
   return event;
-}
-
-function requestAddEvent(event, status, requestPermissions) {
-  Alert.alert(
-    'Add Event?',
-    `Would you like to add ${event.title} to your calendar?`,
-    [
-      { text: 'Cancel', onPress: () => {} },
-      { text: 'Ok', onPress: () => addToCalendar(event, status, requestPermissions), isPreferred: true },
-    ],
-  );
 }
 
 function buttonStyles(colors, fonts, home, pressed) {
