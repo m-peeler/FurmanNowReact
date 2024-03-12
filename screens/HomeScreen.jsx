@@ -34,7 +34,7 @@ export default function HomeScreen(props) {
   const buttonStyles = StyleSheet.create({
     label: {
       flex: 1,
-      color: colors.primary,
+      color: colors.text,
       textAlign: 'center',
       fontFamily: fonts.bold,
       fontSize: 18,
@@ -59,7 +59,7 @@ export default function HomeScreen(props) {
           width: (buttonSize * 2) / 3,
           height: (buttonSize * 2) / 3,
           top: buttonSize / 6,
-          tintColor: pressed ? colors.notificationText : colors.primary,
+          tintColor: buttonTextColor(pressed),
         },
       },
     }),
@@ -73,7 +73,7 @@ export default function HomeScreen(props) {
         fontFamily: fonts.heading,
         fontSize: 40,
         padding: 30,
-        color: pressed ? colors.notificationText : colors.primary,
+        color: buttonTextColor(pressed),
       },
     },
     button: {

@@ -72,7 +72,7 @@ function requestAddAlert(item) {
   );
 }
 
-const renderFront = (item) => function (styles) {
+const renderFront = (item) => function frontCurried(styles) {
   const {
     nameText, nameSize, numberText, numberSize, color,
   } = styles;

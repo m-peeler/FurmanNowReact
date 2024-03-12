@@ -23,6 +23,7 @@ export default function BusStopMarker(props) {
           }}
           >
             <Text style={{ flex: 1, padding: 10 }}>{title}</Text>
+            {eta && <Text>{eta}</Text>}
           </View>
           <View style={{
             borderRadius: 5, width: 10, height: 10, backgroundColor: '#ffffff', top: -5, left: 20, bottomPadding: -5,

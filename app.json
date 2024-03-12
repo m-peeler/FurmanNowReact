@@ -18,7 +18,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSCalendarsFullAccessUsageDescription": "This app requires access to the calendar"
-      }
+      },
+      "bundleIdentifier": "edu.furman.now"
     },
     "android": {
       "adaptiveIcon": {
@@ -31,12 +32,19 @@
     },
     "plugins": [
       [
-      "expo-font",
-      {
-        "fonts": ["./assets/fonts/Abril_Fatface_Italic.otf",
-                  "./assets/fonts/BarlowSemiCondensed-Medium.ttf"]
-      }
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Abril_Fatface_Italic.otf",
+            "./assets/fonts/BarlowSemiCondensed-Medium.ttf"
+          ]
+        }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "11b311bf-c24b-46e9-91c6-72e70582f774"
+      }
+    }
   }
 }

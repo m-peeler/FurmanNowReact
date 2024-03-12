@@ -26,7 +26,7 @@ function colorByCat(category) {
 export default function BusStopMarker({
   coordinate, name, nickname, locationText, category, hasHours, buildingID,
 }) {
-  const {colors, fonts} = useTheme();
+  const { fonts } = useTheme();
   return (
     <Marker coordinate={coordinate} title={name} description={locationText !== undefined ? locationText : ''}>
       <View style={{ flexDirection: 'column' }}>

@@ -29,15 +29,16 @@ const buttonStyl = (colors, fonts) => (pressed) => StyleSheet.create({
       }
       return {
         alignSelf: 'center',
-        borderRadius: 10,
         height: 20,
         width: 20,
         margin: 5,
+        borderRadius: 10,
         backgroundColor: background,
       };
     },
   },
   button: {
+    borderRadius: 8,
     backgroundColor: pressed ? colors.notification : colors.card,
   },
   dayText: {

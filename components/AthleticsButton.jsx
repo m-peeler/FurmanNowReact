@@ -187,7 +187,7 @@ export default function AthleticsButton({ event }) {
         requestPermissions,
       )}
       onPress={() => {
-        if (event.url !== '' && event.url !== 'nullc') {
+        if (event.url && event.url !== '' && event.url !== 'null') {
           Linking.openURL(`https://furmanpaladins.com/${event.url}`);
         }
       }}

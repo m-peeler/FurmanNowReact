@@ -60,6 +60,7 @@ function EventButton({
   const hourRange = new HourRange(start, end || new Date(start + 1000 * 60 * 60));
   const { colors, fonts } = useTheme();
   const [pressed, setPressed] = useState(false);
+  const [engaged, setEngaged] = useState(false);
   const [status, requestPermissions] = useCalendarPermissions();
   const textColor = pressed ? colors.notificationText : colors.text;
   const backColor = pressed ? colors.notification : colors.card;
@@ -75,9 +76,9 @@ function EventButton({
         status,
         requestPermissions,
       )}
+      onPress={() => setEngaged(!engaged)}
     >
       <View style={{
-        padding: 5,
         backgroundColor: backColor,
         borderRadius: 8,
         marginVertical: 5,
@@ -110,18 +111,26 @@ function EventButton({
         >
           {`Located in ${location}`}
         </Text>
-        <Text style={{
-          color: textColor, fontFamily: fonts.regular, fontSize: 14,
-        }}
+        <Text
+          numberOfLines={engaged ? undefined : 2}
+          ellipsizeMode="tail"
+          style={{
+
+            color: textColor,
+            fontFamily: fonts.regular,
+            fontSize: 14,
+          }}
         >
           {`\t${description}`}
         </Text>
-        <Text style={{
-          textAlign: 'center', color: textColor, fontFamily: fonts.italic, fontSize: 16,
-        }}
-        >
-          {`Organized by ${organizer}`}
-        </Text>
+        { engaged && (
+          <Text style={{
+            textAlign: 'center', color: textColor, fontFamily: fonts.italic, fontSize: 16,
+          }}
+          >
+            {`Organized by ${organizer}`}
+          </Text>
+        )}
       </View>
     </Pressable>
   );
@@ -170,7 +179,7 @@ function EventsDisplay({ name, events }) {
                   paddingTop: 5,
                   textAlign: 'center',
                   textAlignVertical: 'bottom',
-                  color: colors.text,
+                  color: colors.black,
                   fontFamily: fonts.heading,
                 }}
                 >
