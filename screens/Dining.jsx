@@ -3,7 +3,8 @@ import { useTheme } from '@react-navigation/native';
 import {
   Dimensions,
   View,
-  SafeAreaView, StyleSheet, Text,
+  SafeAreaView,
+  Text,
 } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import PropTypes from 'prop-types';
@@ -42,7 +43,10 @@ export default function Dining() {
 function DHMenuCard({ meal, stationMenus }) {
   const { colors, fonts } = useTheme();
   return (
-    <View style={{ borderRadius: 8, padding: 10, margin: 10, backgroundColor: colors.card, flexDirection: 'column' }}>
+    <View style={{
+      borderRadius: 8, padding: 10, margin: 10, backgroundColor: colors.card, flexDirection: 'column',
+    }}
+    >
       <Text style={{
         textAlign: 'center', fontSize: 24, fontFamily: fonts.heading, color: colors.text,
       }}
