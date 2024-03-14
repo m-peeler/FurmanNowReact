@@ -20,8 +20,12 @@ function renderResponsiveLabel(text) {
 }
 
 export default function HomeScreen(props) {
+  const {
+    route: { params: { pages } },
+    navigation: { navigate },
+  } = props;
+
   const { colors, fonts } = useTheme();
-  const windowHeight = Dimensions.get('window').height;
 
   function buttonColor(pressed) {
     return pressed ? colors.notification : colors.card;
@@ -29,7 +33,17 @@ export default function HomeScreen(props) {
   function buttonTextColor(pressed) {
     return pressed ? colors.notificationText : colors.text;
   }
-  const buttonSize = (windowHeight / 7) * 0.8;
+  const headerHeight = useHeaderHeight();
+  const { bottom: bottomHeight } = useSafeAreaInsets();
+  const useableHeight = Dimensions.get('window').height - headerHeight - bottomHeight;
+
+  const weatherHeight = (useableHeight / 7) * 2;
+  const buttonPanelHeight = (useableHeight / 7) * 4;
+  const newsHeight = (useableHeight / 7) * 1;
+
+  const buttonCols = 3;
+  // Allocates  a spare row for text display etc
+  const buttonSize = (buttonPanelHeight / (buttonCols + 1)) * 0.8;
 
   const buttonStyles = StyleSheet.create({
     label: {
@@ -69,14 +83,15 @@ export default function HomeScreen(props) {
     front: {
       label: {
         textAlign: 'center',
-        textAlignVertical: 'center',
+        top: newsHeight / 3,
         fontFamily: fonts.heading,
         fontSize: 40,
-        padding: 30,
         color: buttonTextColor(pressed),
       },
     },
     button: {
+      height: (useableHeight / 7),
+      margin: 10,
       backgroundColor: buttonColor(pressed),
       color: buttonTextColor(pressed),
       borderRadius: 20,
@@ -87,32 +102,15 @@ export default function HomeScreen(props) {
     },
   });
 
-  const headerHeight = useHeaderHeight();
-  const { bottom: bottomHeight } = useSafeAreaInsets();
-  const displayableHeight = Dimensions.get('window').height - headerHeight - bottomHeight;
-  const { route } = props;
-  const { navigation } = props;
-  const { navigate } = navigation;
-  const { params } = route;
-  const { pages } = params;
-
   return (
-    <SafeAreaView style={{ flex: 1, flexDirection: 'column' }}>
-      <Weather height={(displayableHeight / 7) * 2} width="100%" />
-      <View style={{ height: (displayableHeight / 7) * 4 }} />
-      <View style={{ alignSelf: 'flex-end', height: displayableHeight / 7, width: '100%' }}>
-        <Button
-          accessibilityLabel="News Feed"
-          accessibilityHint="Press to travel to the news feed"
-          front={renderResponsiveLabel('NEWS FEED')}
-          frontResponsive
-          styles={newsStyles}
-          onPress={() => navigate('Feed')}
-        />
-      </View>
+    <SafeAreaView>
+      <Weather height={weatherHeight} width="100%" />
       <View style={{
-        // eslint-disable-next-line no-mixed-operators
-        flex: 0, height: (displayableHeight / 7) * 4, width: '100%', position: 'absolute', top: (displayableHeight / 7) * 2,
+        height: buttonPanelHeight,
+        width: '100%',
+        position: 'absolute',
+        flex: 1,
+        top: weatherHeight + (buttonPanelHeight / ((buttonCols + 1) * 4)),
       }}
       >
         <FlashList
@@ -120,7 +118,7 @@ export default function HomeScreen(props) {
           estimatedItemSize={100}
           scrollEnabled={false}
           data={pages}
-          numColumns={3}
+          numColumns={buttonCols}
           renderItem={
             ({ item: page }) => (
               <HomeScreenNavButton
@@ -130,6 +128,22 @@ export default function HomeScreen(props) {
               />
             )
             }
+        />
+      </View>
+      <View style={{
+        position: 'absolute',
+        top: weatherHeight + buttonPanelHeight,
+        height: newsHeight,
+        width: '100%',
+      }}
+      >
+        <Button
+          accessibilityLabel="News Feed"
+          accessibilityHint="Press to travel to the news feed"
+          front={renderResponsiveLabel('NEWS FEED')}
+          frontResponsive
+          styles={newsStyles}
+          onPress={() => navigate('Feed')}
         />
       </View>
     </SafeAreaView>

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTheme } from '@react-navigation/native';
 import { SafeAreaView, StyleSheet, View } from 'react-native';
 import MapView from 'react-native-maps';
 import PropTypes from 'prop-types';
+import * as Location from 'expo-location';
 
 // Uses the Google Maps JSON configs to disable various
 // points of interest from being shown on the map;
@@ -78,10 +79,19 @@ export default function FUNowMapView(props) {
     },
   });
 
+  useEffect(() => {
+    const getLocation = async () => {
+      Location.requestForegroundPermissionsAsync();
+    };
+
+    getLocation();
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.bounding}>
         <MapView
+          showsUserLocation
           style={styles.map}
           maxZoomLevel={18}
           initialRegion={{

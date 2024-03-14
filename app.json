@@ -25,7 +25,14 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#110017"
-      }
+      },
+      "permissions": [
+        "WRITE_CONTACTS",
+        "READ_CONTACTS",
+        "CONTACTS",
+        "WRITE_CALENDAR",
+        "READ_CALENDAR"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

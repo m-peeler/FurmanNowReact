@@ -1,6 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
+import { Dimensions, FlatList, View } from 'react-native';
 import PropTypes from 'prop-types';
 
 export default function ButtonList(props) {
@@ -8,14 +7,16 @@ export default function ButtonList(props) {
     data, sorter, style, ...rest
   } = props;
   return (
-    <View style={style}>
+    <View style={{ ...style }}>
       <View style={{
-        borderRadius: 4, margin: '2.5%', height: '97.5%', width: '95%',
+        flexGrow: 1, flex: 1, borderRadius: 4, margin: '2.5%', height: '97.5%', width: '95%',
       }}
       >
-        <FlashList
+        <FlatList
+          style={{ height: Dimensions.get('window').height }}
           // eslint-disable-next-line react/jsx-props-no-spreading
           {...rest}
+          contentContainerStyle={{ flexGrow: 1 }}
           data={sorter(data)}
         />
       </View>

@@ -141,12 +141,15 @@ function HoursButton({
 }
 HoursButton.propTypes = {
   item: PropTypes.arrayOf(
-    PropTypes.string,
-    PropTypes.shape({
-      schedule: PropTypes.instanceOf(Schedule).isRequired,
-    }),
+    PropTypes.oneOfType([PropTypes.string,
+      PropTypes.shape({
+        schedule: PropTypes.instanceOf(Schedule).isRequired,
+      })]),
   ).isRequired,
-  index: PropTypes.string.isRequired,
+  index: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]).isRequired,
   onPress: PropTypes.func.isRequired,
   styles: PropTypes.oneOfType([
     PropTypes.shape({

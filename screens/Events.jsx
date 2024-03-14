@@ -82,6 +82,7 @@ function EventButton({
         backgroundColor: backColor,
         borderRadius: 8,
         marginVertical: 5,
+        padding: 5,
         flexDirection: 'column',
       }}
       >
@@ -163,7 +164,6 @@ function EventsDisplay({ name, events }) {
           marginHorizontal: width * 0.025,
         }}
         estimatedItemSize={30}
-        indices
         data={[name, ...events]}
         renderItem={({ item }) => {
           if (typeof item === 'string') {
@@ -210,7 +210,7 @@ EventsDisplay.propTypes = {
 };
 
 export default function Events() {
-  const [data, loading, fetching] = useDataLoadFetchCache(
+  const [data] = useDataLoadFetchCache(
     'https://cs.furman.edu/~csdaemon/FUNow/clpGet.php',
     'DATA:Events-Cache',
     (dt) => Object.entries(arrayPartition(dt.results, ({ eventType }) => {
@@ -238,10 +238,9 @@ export default function Events() {
     return () => clearInterval(interval);
   }, []);
   const { height, width } = Dimensions.get('window');
-
   return (
     <SafeAreaView style={{ margin: 8 }}>
-      {(!loading || !fetching)
+      {(data)
         && (
         <Carousel
           loop={false}
