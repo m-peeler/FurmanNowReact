@@ -38,6 +38,11 @@ const pages = [
   [new Page(6, 'Map', { category: catHome, icon: MAP }), Map],
   [new Page(7, 'Health', { category: catHome, icon: CADUCEUS }), Health],
   [new Page(8, 'Dates', { category: catHome, icon: DATES }), Dates],
+  [new Page(9, 'Hi', { category: catHome, icon: DATES }), Dates],
+  [new Page(10, 'There', { category: catHome, icon: DATES }), Dates],
+  [new Page(11, 'Gen', { category: catHome, icon: DATES }), Dates],
+  [new Page(12, 'Keno', { category: catHome, icon: DATES }), Dates],
+  [new Page(13, 'Bi', { category: catHome, icon: DATES }), Dates],
 
   [new Page(101, 'The Paladin', { category: catNews }), Blank],
   [new Page(102, 'FUNC', { category: catNews }), Blank],

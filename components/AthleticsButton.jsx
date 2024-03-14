@@ -62,7 +62,7 @@ function buttonStyles(colors, fonts, home, pressed) {
   if (pressed) {
     textColor = colors.notificationText;
   } else if (home) {
-    textColor = colors.accentText;
+    textColor = colors.text;
   } else {
     textColor = colors.text;
   }
@@ -116,8 +116,13 @@ function frontStyles(colors, fonts, home, pressed) {
       fontSize: 16,
       color: sty.color,
       alignContent: 'center',
-      marginLeft: 10,
       flex: 1,
+    },
+    victoryBox: {
+      borderRadius: 30,
+      backgroundColor: colors.notification,
+      paddingHorizontal: 10,
+
     },
   });
 }
@@ -207,7 +212,11 @@ export default function AthleticsButton({ event }) {
         {bottomLeftDisplay === 'Result'
           && <Text style={internalStyles.victory}>{formatVictoryMessage(event)}</Text>}
         {bottomLeftDisplay === 'Home'
-          && <Text style={internalStyles.victory}>Home Game!</Text>}
+          && (
+          <View style={internalStyles.victoryBox}>
+            <Text style={internalStyles.victory}>Home Game!</Text>
+          </View>
+          )}
         <Text style={internalStyles.info}>{formatDatetime(event.eventdate)}</Text>
       </View>
     </Pressable>

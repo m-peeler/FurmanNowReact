@@ -1,165 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
-  View, FlatList, Text,
+  View, FlatList,
   Dimensions,
-  Image,
-  Pressable,
-  Linking,
   Platform,
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
 import PropTypes from 'prop-types';
 import Carousel from 'react-native-reanimated-carousel';
 import Page from '../utilities/Page';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
-import { getDateSuffix, parseDatetime } from '../utilities/DateTimeFunctions';
-import APRIL from '../assets/images/months/April.jpeg';
-
-function dateFormat(date) {
-  return `${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}${getDateSuffix(date)}, ${date.getFullYear()}`;
-}
+import { parseDatetime } from '../utilities/DateTimeFunctions';
+import NewsYoutubeCard from '../components/news/NewsYoutubeCard';
+import NewsLinkCard from '../components/news/NewsLinkCard';
 
 function datesAreWithin(first, second, milliseconds) {
   return Math.abs(first.getTime() - second.getTime()) < milliseconds;
 }
-
-function NewsLinkCard({
-  height, width, title, description, author, date, section,
-  link, imageLink, publisher, publisherLink, publisherImageLink,
-}) {
-  const { colors, fonts } = useTheme();
-  const [pressed, setPressed] = useState(false);
-  const textColor = pressed ? colors.notificationText : colors.text;
-  const cardColor = pressed ? colors.notification : colors.card;
-  const titleFont = fonts.bold;
-  const sourceFont = fonts.italic;
-  const providenceFont = fonts.italic;
-  const bodyFont = fonts.regular;
-  const styles = {
-    card: {
-      borderRadius: 10,
-      backgroundColor: cardColor,
-      margin: 5,
-      height: height - 2 * 5,
-      width: width - 2 * 5,
-    },
-    image: {
-      borderTopLeftRadius: 10,
-      borderTopRightRadius: 10,
-      width: '100%',
-      height: '72%',
-    },
-    title: {
-      paddingHorizontal: 5,
-      fontFamily: titleFont,
-      fontSize: 20,
-      color: textColor,
-    },
-    titleBox: {
-      position: 'absolute',
-      bottom: '42%',
-      backgroundColor: `${cardColor}aa`,
-      paddingVertical: 5,
-      borderTopRightRadius: 10,
-      borderBottomRightRadius: 10,
-    },
-    publisher: {
-      fontFamily: sourceFont,
-      fontSize: 16,
-      color: textColor,
-    },
-    publisherBox: {
-      bottom: '27%',
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-      right: 0,
-      position: 'absolute',
-      backgroundColor: cardColor,
-      borderTopLeftRadius: 6,
-      borderTopRightRadius: 6,
-    },
-    description: {
-      fontFamily: bodyFont,
-      fontSize: 14,
-      color: textColor,
-    },
-    providence: {
-      flex: 1,
-      fontFamily: providenceFont,
-      fontSize: 18,
-      color: textColor,
-    },
-  };
-  return (
-    <Pressable
-      onTouchCancel={() => setPressed(false)}
-      onTouchEnd={() => setPressed(false)}
-      onTouchStart={() => setPressed(true)}
-      onPress={() => Linking.openURL(link)}
-    >
-      <View style={styles.card}>
-        <Image
-          style={styles.image}
-          source={imageLink && imageLink !== '' ? { uri: imageLink } : APRIL}
-        />
-        <View style={styles.titleBox}>
-          <Text style={styles.title}>
-            {title}
-          </Text>
-        </View>
-        <View style={{ ...styles.publisherBox, flexDirection: 'row' }}>
-          {section
-            && section !== ''
-            && (
-            <Text style={{ ...styles.publisher, fontFamily: titleFont, paddingRight: 10 }}>
-              {`${section}\t|`}
-            </Text>
-            )}
-          <Text style={styles.publisher}>
-            {publisher}
-          </Text>
-        </View>
-        <View style={{ padding: 5 }}>
-          <View style={{ flexDirection: 'row' }}>
-            <Text style={styles.providence}>
-              {author}
-            </Text>
-            <Text style={{ ...styles.providence, textAlign: 'right' }}>
-              {dateFormat(date)}
-            </Text>
-          </View>
-          <Text
-            numberOfLines={2}
-            style={styles.description}
-          >
-            {description}
-          </Text>
-        </View>
-      </View>
-    </Pressable>
-  );
-}
-NewsLinkCard.propTypes = {
-  height: PropTypes.number.isRequired,
-  width: PropTypes.number.isRequired,
-  title: PropTypes.string.isRequired,
-  link: PropTypes.string.isRequired,
-  date: PropTypes.instanceOf(Date).isRequired,
-  publisher: PropTypes.string.isRequired,
-  publisherLink: PropTypes.string.isRequired,
-  publisherImageLink: PropTypes.string,
-  description: PropTypes.string,
-  section: PropTypes.string,
-  author: PropTypes.string,
-  imageLink: PropTypes.string,
-};
-NewsLinkCard.defaultProps = {
-  publisherImageLink: undefined,
-  description: undefined,
-  author: undefined,
-  imageLink: undefined,
-  section: undefined,
-};
 
 function NewsItemCard({
   height, width, title, description, author, date, mediaType, section,
@@ -167,6 +22,23 @@ function NewsItemCard({
 }) {
   switch (mediaType) {
     case 'video':
+      return (
+
+        <NewsYoutubeCard
+          height={height}
+          width={width}
+          title={title}
+          description={description}
+          author={author}
+          date={date}
+          section={section}
+          link={link}
+          imageLink={imageLink}
+          publisher={publisher}
+          publisherLink={publisherLink}
+          publisherImageLink={publisherImageLink}
+        />
+      );
     case 'link':
     default:
       return (

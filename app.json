@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "FurmanNow",
+    "name": "Furman Now!",
     "slug": "FurmanNow",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -32,7 +32,8 @@
         "CONTACTS",
         "WRITE_CALENDAR",
         "READ_CALENDAR"
-      ]
+      ],
+      "package": "edu.furman.now"
     },
     "web": {
       "favicon": "./assets/favicon.png"

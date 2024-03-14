@@ -8,6 +8,7 @@ export default function Dates() {
   const [data, loading, fetching] = useDataLoadFetchCache(
     'https://cs.furman.edu/~csdaemon/FUNow/importantDateGet.php',
     'DATA:Dates-Cache',
+    (resp) => resp.results,
   );
 
   const style = StyleSheet.create({
@@ -17,8 +18,8 @@ export default function Dates() {
 
   return (
     <SafeAreaView>
-      {(!loading || !fetching)
-        && <Text style={style}>{data.results.map((item) => `${item.title} \t ${item.date}\n`)}</Text>}
+      {(data)
+        && <Text style={style}>{data.map((item) => `${item.title} \t ${item.date}\n`)}</Text>}
     </SafeAreaView>
   );
 }

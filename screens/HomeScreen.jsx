@@ -41,7 +41,7 @@ export default function HomeScreen(props) {
   const buttonPanelHeight = (useableHeight / 7) * 4;
   const newsHeight = (useableHeight / 7) * 1;
 
-  const buttonCols = 3;
+  const buttonCols = 2;
   // Allocates  a spare row for text display etc
   const buttonSize = (buttonPanelHeight / (buttonCols + 1)) * 0.8;
 

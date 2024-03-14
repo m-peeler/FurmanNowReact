@@ -27,6 +27,7 @@ const CommonTheme = {
     emergencyText: palette.black,
     positive: palette.furmanCompGreen,
     negative: palette.furmanCompRed,
+    notificationContrast: palette.black,
   },
 };
 
@@ -45,6 +46,7 @@ const DefaultTheme = {
     border: palette.furmanCompYellow,
     notification: palette.furmanCompBlue,
     notificationText: palette.furmanWhite,
+    shadow: palette.black,
   },
 };
 
@@ -63,6 +65,7 @@ const DarkTheme = {
     border: palette.furmanCompBlue,
     notification: palette.furmanCompYellow,
     notificationText: palette.black,
+    shadow: palette.furmanWhite,
   },
 };
 

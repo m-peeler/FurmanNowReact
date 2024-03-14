@@ -3,6 +3,7 @@ import { Callout, Marker } from 'react-native-maps';
 import { Text, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import PropTypes from 'prop-types';
+import ContextMenu from 'react-native-context-menu-view';
 
 function colorByCat(category) {
   switch (category) {
@@ -26,20 +27,24 @@ function colorByCat(category) {
 export default function BusStopMarker({
   coordinate, name, nickname, locationText, category, hasHours, buildingID,
 }) {
-  const { fonts } = useTheme();
+  const { colors, fonts } = useTheme();
   return (
     <Marker coordinate={coordinate} title={name} description={locationText !== undefined ? locationText : ''}>
       <View style={{ flexDirection: 'column' }}>
-        <View
-          style={{
-            backgroundColor: colorByCat(category),
-            borderRadius: 13,
-            borderColor: 'white',
-            borderWidth: 4,
-            width: 26,
-            height: 26,
-          }}
-        />
+        <ContextMenu
+          actions={[{ title: 'Hello' }]}
+        >
+          <View
+            style={{
+              backgroundColor: colorByCat(category),
+              borderRadius: 6,
+              borderColor: colors.card,
+              borderWidth: 4,
+              width: 26,
+              height: 26,
+            }}
+          />
+        </ContextMenu>
       </View>
       <Callout tooltip>
         <View>

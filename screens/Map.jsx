@@ -6,6 +6,8 @@ import FUNowMapView from '../components/CustomMapView';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
 import BuildingMarker from '../components/BuildingMarker';
 import BusRoutePolyline from '../components/BusRoutePolyline';
+import { parseDatetime } from '../utilities/DateTimeFunctions';
+import BusStopMarker from '../components/BuildingMarker';
 
 const secondLineEncoded = 'kretE`~cvNA??CAAACEEIEA?A?A@CDOVEFm@l@GHQVO\\GVANCR??@?\\FLDDDFFBH??hAY^Ih@O\\MFCVMJC`@UnBkApAu@^Sn@_@v@e@HE\\Wj@_@??l@`A@DP\\p@tAV|@DLHZDRF\\Nf@P\\FHBB@BTV^\\h@Z^Jj@H`@@??LA@?AO@NB?PEPM@AvD@BQHYN]LSRQRGXCVAPBb@R@GAFNHxAlAf@n@FJDJBJBP@d@@RAFABQ`@Sd@INGFKFk@P??FVDHIDHE\\hANd@??IJCDQZSZADCFEP?N?@@D@NFN?BBBBHFN@BDF?@h@`A\\b@v@j@B@\\LZND?b@@b@B`@EJAt@]FGv@w@Z[JS?Q?ICKIQACS]CEe@}@AASa@Uc@GM[XZYMUUa@??`AaAZ[Z[RSr@mA??P?PENGPMDMDDEEDKFc@?QEOGSKQOMOEWA??c@c@eCoCuB}Bq@k@?A?@s@k@}D}BgCyA??AO?MAKAGCGCGCIEGGGEGECEEECGCWGGAI?E?K@E@YJKFIJKNGP?DOENDCJCZ@X??aA[a@Ma@MKCy@SEAeBTOFIDUNGDWRKJ??EQDPYV]Xa@^WPKHk@^]VIDw@d@o@^_@RqAt@oBjAa@TKBWLGB]Li@N_@HiAX??CIGGEEME]GA???BS@OFWN]PJF@DAJEPOTSNUR]BI?C?A';
 
@@ -51,6 +53,24 @@ export default function Map() {
     'DATA:Building-Map-Info-Cache',
     (d) => d.results,
   );
+  const [vehicles, , , , refresh] = useDataLoadFetchCache(
+    'https://cs.furman.edu/~csdaemon/FUNow/shuttleGet.php?v=all',
+    'DATA:Vehicle-Locations',
+    (d) => d.results
+      .filter((v) => Date.now() - parseDatetime(v.updated) < (3 * 60 * 1000))
+      .map(
+        ({ latitude, longitude, ...rest }) => ({ ...rest, coordinate: { latitude, longitude } }),
+      ),
+    (vehics) => vehics.length > 0,
+  );
+
+  useEffect(() => {
+    if (vehicles === undefined) return undefined;
+    const interval = setInterval(() => {
+      refresh();
+    }, 5_000);
+    return () => clearInterval(interval);
+  }, [vehicles, refresh]);
 
   const [locsEnabled, setLocsEnabled] = useState(true);
   const toggleLocs = () => setLocsEnabled(!locsEnabled);
@@ -81,6 +101,10 @@ export default function Map() {
             }) => <BusRoutePolyline key={name} color={color} route={route} stops={stops} />)}
           </View>
           )}
+        {vehicles && routesEnabled
+            && vehicles.map(
+              ({ coordinate, vehicle }) => <BusStopMarker name={vehicle} coordinate={coordinate} />,
+            )}
         {buildings !== undefined
         && locsEnabled
         && buildings.map((building) => (

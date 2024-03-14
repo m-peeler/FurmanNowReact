@@ -18,7 +18,12 @@
     "preview": {
       "distribution": "internal"
     },
-    "production": {}
+    "production": {
+      "android" : {
+        "buildType": "app-bundle",
+        "image": "latest"
+      }
+    }
   },
   "submit": {
     "production": {}
