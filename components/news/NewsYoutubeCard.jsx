@@ -82,7 +82,13 @@ export default function NewsYoutubeCard(
           <Text
             numberOfLines={1}
             style={{
-              paddingBottom: 5, paddingHorizontal: 5, position: 'absolute', top: 10, fontFamily: fonts.bold, fontSize: 20,
+              paddingBottom: 5,
+              paddingHorizontal: 5,
+              position: 'absolute',
+              top: 10,
+              fontFamily: fonts.bold,
+              fontSize: 20,
+              color: colors.text,
             }}
           >
             {title}

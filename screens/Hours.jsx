@@ -40,6 +40,12 @@ const buttonStyl = (colors, fonts) => (pressed) => StyleSheet.create({
   button: {
     borderRadius: 8,
     backgroundColor: pressed ? colors.notification : colors.card,
+    shadowColor: colors.shadow,
+    margin: 5,
+    padding: 5,
+    elevation: 2,
+    shadowOffset: { height: 2, width: 2 },
+    shadowOpacity: 0.2,
   },
   dayText: {
     fontFamily: fonts.regular,

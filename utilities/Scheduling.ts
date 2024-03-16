@@ -174,7 +174,7 @@ export enum DaysOfWeek {
     }
  
     static hoursToAm = (hours : Date) : string => {
-      return hours.getHours() - 12 > 0 && hours.getHours() != 24 ? "pm" : "am";
+      return hours.getHours() - 12 >= 0 && hours.getHours() != 24 ? "pm" : "am";
     }
  
     static hoursToStr = (hours : number) : string => {

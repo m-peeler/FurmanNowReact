@@ -256,6 +256,7 @@ export default function Events() {
           width={width}
           height={height}
           style={{ alignSelf: 'center', width, height }}
+          panGestureHandlerProps={{ activeOffsetX: [-10, 10] }}
         />
         )}
     </SafeAreaView>

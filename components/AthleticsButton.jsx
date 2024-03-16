@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, Pressable,
   Linking,
+  Share,
 } from 'react-native';
 import * as Calendar from 'expo-calendar';
 import { useTheme } from '@react-navigation/native';
 import PropTypes from 'prop-types';
+import ContextMenu from 'react-native-context-menu-view';
 import { isAllDay, requestAddEvent, getDateSuffix } from '../utilities/DateTimeFunctions';
 
 function locIndText(locationIndicator) {
@@ -118,7 +120,14 @@ function frontStyles(colors, fonts, home, pressed) {
       alignContent: 'center',
       flex: 1,
     },
-    victoryBox: {
+    home: {
+      fontFamily: fonts.italic,
+      fontSize: 16,
+      color: pressed ? colors.notificationText : colors.notificationContrast,
+      alignContent: 'center',
+      flex: 1,
+    },
+    homeBox: {
       borderRadius: 30,
       backgroundColor: colors.notification,
       paddingHorizontal: 10,
@@ -127,12 +136,12 @@ function frontStyles(colors, fonts, home, pressed) {
   });
 }
 
-function formatDatetime(date) {
+function formatDatetime(date, verbose = false) {
   if (date === undefined) {
     return '';
   }
-  const month = date.toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'short' });
-  const weekday = date.toLocaleDateString('en-US', { timeZone: 'America/New_York', weekday: 'short' });
+  const month = date.toLocaleDateString('en-US', { timeZone: 'America/New_York', month: verbose ? 'long' : 'short' });
+  const weekday = date.toLocaleDateString('en-US', { timeZone: 'America/New_York', weekday: verbose ? 'long' : 'short' });
   let time;
   if (isAllDay(date)) {
     time = 'All Day';
@@ -144,11 +153,15 @@ function formatDatetime(date) {
     const ampm = date.getHours() >= 12 && date.getHours() !== 24 ? 'pm' : 'am';
     time = `${hours}:${minutes} ${ampm}`;
   }
-  return `${time}, ${weekday}. ${month}. ${date.getDate()}`;
+  const output = verbose
+    ? `${time === 'All Day' ? 'all day ' : ''}on ${weekday}, ${month} ${date.getDate()}${getDateSuffix(date)}${time !== 'All Day' ? ` at ${time}` : ''}`
+    : `${time}, ${weekday}. ${month}. ${date.getDate()}`;
+  return output;
 }
 
-function formatAccessibilitySummary(item) {
+function formatSummary(item, verbose = false) {
   const location = locIndText(item.location_indicator);
+  const team = `The ${verbose ? 'Furman ' : ''}${item.sportTitle} team`;
   if (item.resultStatus !== '') {
     let victStatus;
     if (item.resultStatus === 'W') {
@@ -160,13 +173,13 @@ function formatAccessibilitySummary(item) {
     } else {
       victStatus = 'drew';
     }
-    const results = `The ${item.sportTitle} team ${victStatus} ${location} ${item.opponent}`;
-    if (item.resultStatus === 'N') return results;
+    const results = `${team} ${victStatus} ${location} ${item.opponent}`;
+    if (item.resultStatus === 'N') return `${results}.`;
     return `${results}, with a final score of Furman ${item.resultUs} to ${item.opponent} ${item.resultThem}`;
   } if (item.noplayText !== '') {
-    return `The ${item.sportTitle} game ${location} ${item.opponent} was ${item.noplayText}.`;
+    return `${team} game ${location} ${item.opponent} was ${item.noplayText}.`;
   }
-  return `The ${item.sportTitle} team will play ${location} ${item.opponent} ${formatDatetime(item.eventdate)}.`;
+  return `${team} will play ${location} ${item.opponent} ${formatDatetime(item.eventdate, true)}.${verbose ? ' Roll Dins!' : ''}`;
 }
 
 export default function AthleticsButton({ event }) {
@@ -177,49 +190,81 @@ export default function AthleticsButton({ event }) {
   const styles = buttonStyles(colors, fonts, isHome, pressed);
   const internalStyles = frontStyles(colors, fonts, isHome, pressed);
 
-  let bottomLeftDisplay = event.location_indicator === 'H' ? 'Home' : undefined;
-  bottomLeftDisplay = event.resultStatus !== '' ? 'Result' : bottomLeftDisplay;
-  bottomLeftDisplay = event.noplayText !== '' ? 'Noplay' : bottomLeftDisplay;
+  let displayState = event.location_indicator === 'H' ? 'Home' : undefined;
+  displayState = event.resultStatus !== '' ? 'Result' : displayState;
+  displayState = event.noplayText !== '' ? 'Noplay' : displayState;
+
+  let contextMenuMessage = 'Share the Game';
+  contextMenuMessage = displayState === 'Results' ? 'Share the Recap' : contextMenuMessage;
+  contextMenuMessage = displayState === 'Noplay' ? 'Share the Cancellation' : contextMenuMessage;
+
   return (
-    <Pressable
-      frontResponsive
-      onTouchStart={() => setPressed(true)}
-      onTouchEnd={() => setPressed(false)}
-      onTouchCancel={() => setPressed(false)}
-      onLongPress={() => requestAddEvent(
-        setupEventData(event),
-        status,
-        requestPermissions,
-      )}
-      onPress={() => {
-        if (event.url && event.url !== '' && event.url !== 'null') {
-          Linking.openURL(`https://furmanpaladins.com/${event.url}`);
+    <ContextMenu
+      actions={[
+        { title: 'Save to Calendar' },
+        { title: contextMenuMessage },
+      ]}
+      onPress={({ nativeEvent }) => {
+        const { name } = nativeEvent;
+        switch (name) {
+          case 'Save to Calendar':
+            requestAddEvent(
+              setupEventData(event),
+              status,
+              requestPermissions,
+            );
+            break;
+          case 'Share the Game':
+          case 'Share the Cancellation':
+            Share.share({
+              message: `${formatSummary(event, true)}\n\nShared from the Furman Now! app.`,
+            });
+            break;
+          case 'Share the Recap':
+            Share.share({
+              message: `${formatSummary(event, true)}\n\nRead more at ${event.url}\n\nShared from the Furman Now! app.`,
+            });
+            break;
+          default:
+            break;
         }
       }}
-      accessibilityLabel={formatAccessibilitySummary(event)}
-      accessibilityHint="Click for more information."
-      style={styles}
     >
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={internalStyles.title}>{event.sportTitle}</Text>
-        <Text style={internalStyles.versus}>
-          {`${formatOpponent(event)}`}
-        </Text>
-      </View>
-      <View style={{ flexDirection: 'row' }}>
-        {bottomLeftDisplay === 'Noplay'
+      <Pressable
+        frontResponsive
+        onTouchStart={() => setPressed(true)}
+        onTouchEnd={() => setPressed(false)}
+        onTouchCancel={() => setPressed(false)}
+        onPress={() => {
+          if (event.url && event.url !== '' && event.url !== 'null') {
+            Linking.openURL(`https://furmanpaladins.com/${event.url}`);
+          }
+        }}
+        accessibilityLabel={formatSummary(event)}
+        accessibilityHint="Click for more information."
+        style={styles}
+      >
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={internalStyles.title}>{event.sportTitle}</Text>
+          <Text style={internalStyles.versus}>
+            {`${formatOpponent(event)}`}
+          </Text>
+        </View>
+        <View style={{ flexDirection: 'row' }}>
+          {displayState === 'Noplay'
           && <Text style={internalStyles.cancelled}>{event.noplayText}</Text>}
-        {bottomLeftDisplay === 'Result'
+          {displayState === 'Result'
           && <Text style={internalStyles.victory}>{formatVictoryMessage(event)}</Text>}
-        {bottomLeftDisplay === 'Home'
+          {displayState === 'Home'
           && (
-          <View style={internalStyles.victoryBox}>
-            <Text style={internalStyles.victory}>Home Game!</Text>
+          <View style={internalStyles.homeBox}>
+            <Text style={internalStyles.home}>Home Game!</Text>
           </View>
           )}
-        <Text style={internalStyles.info}>{formatDatetime(event.eventdate)}</Text>
-      </View>
-    </Pressable>
+          <Text style={internalStyles.info}>{formatDatetime(event.eventdate)}</Text>
+        </View>
+      </Pressable>
+    </ContextMenu>
   );
 }
 AthleticsButton.propTypes = {
@@ -246,13 +291,13 @@ export function AthleticsHeading({ heading, date }) {
     heading: {
       fontFamily: fonts.heading,
       fontSize: 28,
-      color: colors.text,
+      color: colors.notificationContrast,
       flex: 2,
     },
     headingDate: {
       fontFamily: fonts.italic,
       fontSize: 18,
-      color: colors.text,
+      color: colors.notificationContrast,
       textAlign: 'right',
     },
     bounding: {

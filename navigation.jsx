@@ -21,6 +21,11 @@ import MAP from './assets/icon/icon-map.png';
 import DATES from './assets/icon/icon-dates.png';
 import CADUCEUS from './assets/icon/icon-health.png';
 import FOOD from './assets/icon/icon-food.png';
+import PARKING from './assets/icon/icon-car.png';
+import BUS from './assets/icon/icon-bus.png';
+import BENCH from './assets/icon/bench-freepik.png';
+import LINK from './assets/icon/icon-link.png';
+import Transit from './screens/Transit';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,27 +34,16 @@ const catNews = 'News Sources';
 const pages = [
   [new Page(1, 'Contact', { category: catHome, icon: SMARTPHONE }), Contacts],
   [new Page(2, 'Athletics', { category: catHome, icon: BASKETBALL }), Athletics],
-  [new Page(21, 'Athletics-More-Info', { showName: false }), Blank],
   [new Page(3, 'Hours', { category: catHome, icon: CLOCK }), Hours],
-  [new Page(31, 'Hours-More-Info', { showName: false }), Blank],
   [new Page(4, 'Dining', { category: catHome, icon: FOOD }), Dining],
-  [new Page(41, 'Dining-More-Info', { showName: false }), Blank],
   [new Page(5, 'Events', { category: catHome, icon: EVENTS }), Events],
   [new Page(6, 'Map', { category: catHome, icon: MAP }), Map],
-  [new Page(7, 'Health', { category: catHome, icon: CADUCEUS }), Health],
-  [new Page(8, 'Dates', { category: catHome, icon: DATES }), Dates],
-  [new Page(9, 'Hi', { category: catHome, icon: DATES }), Dates],
-  [new Page(10, 'There', { category: catHome, icon: DATES }), Dates],
-  [new Page(11, 'Gen', { category: catHome, icon: DATES }), Dates],
-  [new Page(12, 'Keno', { category: catHome, icon: DATES }), Dates],
-  [new Page(13, 'Bi', { category: catHome, icon: DATES }), Dates],
-
-  [new Page(101, 'The Paladin', { category: catNews }), Blank],
-  [new Page(102, 'FUNC', { category: catNews }), Blank],
-  [new Page(103, 'The Echo', { category: catNews }), Blank],
-  [new Page(104, 'Christo et Doctrinae', { category: catNews }), Blank],
-  [new Page(105, "President's Page", { category: catNews }), Blank],
-  [new Page(106, 'In the News', { category: catNews }), Blank],
+  [new Page(7, 'Transit', { category: catHome, icon: BUS }), Transit],
+  [new Page(8, 'Health', { category: catHome, icon: CADUCEUS }), Health],
+  [new Page(9, 'Dates', { category: catHome, icon: DATES }), Dates],
+  [new Page(10, 'Parking', { category: catHome, icon: PARKING }), Blank],
+  [new Page(11, 'Links', { category: catHome, icon: LINK }), Blank],
+  [new Page(12, 'Benches', { category: catHome, icon: BENCH }), Blank],
 ];
 
 export default function Navigation() {

@@ -117,7 +117,7 @@ export async function addToCalendar(event, status, requestPermissions, calendarN
   if (stat.status !== Calendar.PermissionStatus.GRANTED) {
     stat = await requestPermissions();
   }
-  if (!status.granted) {
+  if (!stat.granted) {
     directToSettings();
     return;
   }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, forwardRef } from 'react';
 import { useTheme } from '@react-navigation/native';
 import { SafeAreaView, StyleSheet, View } from 'react-native';
 import MapView from 'react-native-maps';
@@ -46,9 +46,9 @@ const removePOIs = [
   },
 ];
 
-export default function FUNowMapView(props) {
+const FUNowMapView = forwardRef((props, ref) => {
   const { colors } = useTheme();
-  const { children } = props;
+  const { children, onPress, onRegionChange } = props;
   let { zoom } = props;
 
   if (zoom !== undefined && zoom !== 0) {
@@ -91,6 +91,8 @@ export default function FUNowMapView(props) {
     <SafeAreaView style={styles.container}>
       <View style={styles.bounding}>
         <MapView
+          ref={ref}
+          onRegionChange={onRegionChange}
           showsUserLocation
           style={styles.map}
           maxZoomLevel={18}
@@ -102,6 +104,7 @@ export default function FUNowMapView(props) {
           }}
           showsPointsOfInterest={false}
           customMapStyle={removePOIs}
+          onPress={onPress}
         >
 
           {children}
@@ -109,15 +112,21 @@ export default function FUNowMapView(props) {
       </View>
     </SafeAreaView>
   );
-}
+})
 FUNowMapView.propTypes = {
   zoom: PropTypes.number,
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
     PropTypes.node,
   ]),
+  onPress: PropTypes.func,
+  ref: PropTypes.shape({}),
 };
 FUNowMapView.defaultProps = {
   zoom: 1,
   children: null,
+  onPress: undefined,
+  ref: undefined,
 };
+
+export default FUNowMapView;

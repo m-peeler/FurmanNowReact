@@ -41,9 +41,10 @@ export default function HomeScreen(props) {
   const buttonPanelHeight = (useableHeight / 7) * 4;
   const newsHeight = (useableHeight / 7) * 1;
 
-  const buttonCols = 2;
+  const buttonCols = 4;
+  const buttonRows = 3;
   // Allocates  a spare row for text display etc
-  const buttonSize = (buttonPanelHeight / (buttonCols + 1)) * 0.8;
+  const buttonSize = (buttonPanelHeight / (Math.max(buttonCols, buttonRows) + 1)) * 0.8;
 
   const buttonStyles = StyleSheet.create({
     label: {

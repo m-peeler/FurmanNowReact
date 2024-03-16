@@ -121,6 +121,9 @@ function NewsCardStack({
           description={entry.description}
         />
       )}
+      panGestureHandlerProps={{
+        activeOffsetX: [-10, 10],
+      }}
     />
   );
 }

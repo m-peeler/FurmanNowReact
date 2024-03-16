@@ -1,9 +1,8 @@
 import React from 'react';
-import { Callout, Marker } from 'react-native-maps';
-import { Text, View } from 'react-native';
+import { Polygon, Marker } from 'react-native-maps';
 import { useTheme } from '@react-navigation/native';
 import PropTypes from 'prop-types';
-import ContextMenu from 'react-native-context-menu-view';
+import { decode } from '@googlemaps/polyline-codec';
 
 function colorByCat(category) {
   switch (category) {
@@ -17,60 +16,39 @@ function colorByCat(category) {
       return '#227c7c';
     case 'academic':
       return '#88224c';
-    case 'athletic':
-      return '#2c3f86';
+    case 'dining':
+      return '#332f1d';
+    case 'athletics':
+      return '#2c835c88';
     default:
       return '#000000';
   }
 }
 
-export default function BusStopMarker({
-  coordinate, name, nickname, locationText, category, hasHours, buildingID,
+export default function BuildingMarker({
+  coordinate, name, nickname, locationText, category, hasHours, buildingID, onPress, polyline,
 }) {
-  const { colors, fonts } = useTheme();
+  // eslint-disable-next-line no-param-reassign
+  const { colors } = useTheme();
   return (
-    <Marker coordinate={coordinate} title={name} description={locationText !== undefined ? locationText : ''}>
-      <View style={{ flexDirection: 'column' }}>
-        <ContextMenu
-          actions={[{ title: 'Hello' }]}
-        >
-          <View
-            style={{
-              backgroundColor: colorByCat(category),
-              borderRadius: 6,
-              borderColor: colors.card,
-              borderWidth: 4,
-              width: 26,
-              height: 26,
-            }}
-          />
-        </ContextMenu>
-      </View>
-      <Callout tooltip>
-        <View>
-          <View style={{
-            backgroundColor: 'white',
-            width: 300,
-            flexDirection: 'row',
-            borderRadius: 12,
-            overflow: 'hidden',
-          }}
-          >
-            <View style={{ paddingHorizontal: 10, paddingVertical: 5, flex: 1 }}>
-              <Text style={{ color: 'black', fontSize: 20, flex: 1 }}>
-                {nickname || name}
-              </Text>
-              {nickname
-                && (<Text style={{ color: 'black', fontSize: 12, fontFamily: fonts.italic }}>{name}</Text>)}
-              <Text style={{ color: 'black', fontSize: 15 }}>{locationText !== undefined ? locationText : ''}</Text>
-            </View>
-          </View>
-        </View>
-      </Callout>
-    </Marker>
+    polyline
+      ? (
+        <Polygon
+          key={`${name} Shape`}
+          coordinates={decode(polyline, 5).map(
+            (point) => ({ latitude: point[0], longitude: point[1] }),
+          )}
+          onPress={onPress}
+          lineCap="butt"
+          fillColor={colorByCat(category)}
+          strokeColor={colors.card}
+          strokeWidth={4}
+        />
+      )
+      : <Marker key={`${name} Marker`} coordinate={coordinate} title={name} />
   );
 }
-BusStopMarker.propTypes = {
+BuildingMarker.propTypes = {
   coordinate: PropTypes.shape({
     latitude: PropTypes.number.isRequired,
     longitude: PropTypes.number.isRequired,
@@ -78,14 +56,18 @@ BusStopMarker.propTypes = {
   name: PropTypes.string.isRequired,
   nickname: PropTypes.string,
   locationText: PropTypes.string,
-  category: PropTypes.oneOf(['auxillary', 'auxiliary', 'housing', 'misc', 'misc.', 'academic', 'athletics']),
+  category: PropTypes.oneOf(['auxillary', 'auxiliary', 'dining', 'housing', 'misc', 'misc.', 'academic', 'athletics']),
   hasHours: PropTypes.bool,
   buildingID: PropTypes.number,
+  onPress: PropTypes.func,
+  polyline: PropTypes.string,
 };
-BusStopMarker.defaultProps = {
+BuildingMarker.defaultProps = {
   nickname: undefined,
   category: 'misc',
   locationText: undefined,
   hasHours: false,
   buildingID: undefined,
+  onPress: undefined,
+  polyline: PropTypes.string,
 };

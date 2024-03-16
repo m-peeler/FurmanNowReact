@@ -13,7 +13,7 @@ export default function NewsCardWrapper({
   const style = {
     borderRadius: 10,
     backgroundColor: color,
-    marginVertical: 10,
+    marginVertical: 15,
     marginHorizontal: 5,
     height: height - 2 * 5,
     width: width - 2 * 5,
@@ -25,8 +25,8 @@ export default function NewsCardWrapper({
   return (
     <ContextMenu
       actions={
-      [{ title: 'Share Article' },
-        { title: 'Copy Article Link' },
+      [{ title: 'Share News' },
+        { title: 'Copy News Link' },
         {
           title: `${publisher}`,
           actions: [

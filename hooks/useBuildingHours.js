@@ -66,9 +66,7 @@ export default function useBuildingHours() {
   const [dataExists, setDataExists] = useState(false);
 
   useEffect(() => {
-    console.log('Lets Go');
     if (!(notEmpty(hoursData) && notEmpty(buildingData))) return;
-    console.log('Lets Go!');
     const structured = joinBuildingInfo(hoursData, buildingData);
     setData(structured);
     setDataExists(true);

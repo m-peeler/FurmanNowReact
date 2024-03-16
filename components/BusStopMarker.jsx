@@ -1,34 +1,75 @@
 import React from 'react';
 import { Callout, Marker } from 'react-native-maps';
-import { Text, View } from 'react-native';
+import {
+  Text, View, Image, Dimensions, Pressable, Linking,
+  Platform,
+} from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import PropTypes from 'prop-types';
+import BUSSTOP from '../assets/icon/bus-stop-freepik.png';
 
 export default function BusStopMarker(props) {
   const {
-    title, eta, color, coordinate,
+    title, eta, color, coordinate, website, vehicleName,
   } = props;
+  const { colors, fonts } = useTheme();
   return (
     <Marker
       coordinate={coordinate}
-      flat
+      title={title}
     >
       <View style={{
-        borderColor: color, borderWidth: 5, backgroundColor: '#ffffff', height: 30, width: 30, borderRadius: 15, justifyContent: 'center', alignContent: 'center',
+        shadowColor: colors.shadow,
+        shadowOpacity: 0.3,
+        shadowOffset: { width: 0, height: 1 },
+        elevation: 2,
+        paddingBottom: Platform.OS === 'ios' ? 50 : undefined,
       }}
-      />
+      >
+        <Image
+          source={BUSSTOP}
+          style={{
+            height: 50,
+            width: 50,
+            margin: 10,
+            padding: 10,
+            tintColor: color,
+          }}
+        />
+      </View>
       <Callout tooltip>
-        <View>
+        <View style={{ width: Dimensions.get('window').width * (2 / 3) }}>
           <View style={{
-            borderColor: '#ffffff', borderWidth: 5, borderRadius: 5, backgroundColor: '#ffffff', flex: 1, width: '100%',
+            borderColor: '#ffffff', borderWidth: 5, borderRadius: 5, backgroundColor: '#ffffff',
           }}
           >
-            <Text style={{ flex: 1, padding: 10 }}>{title}</Text>
-            {eta && <Text>{eta}</Text>}
+            <Text style={{
+              flex: 1, textAlign: 'center', fontFamily: fonts.bold, fontSize: 20,
+            }}
+            >
+              {title}
+            </Text>
+            {eta
+              && (
+              <Text style={{ fontFamily: fonts.regular, fontSize: 18, paddingBottom: 4 }}>
+                {eta}
+              </Text>
+              )}
+            {website && (
+            <Pressable
+              style={{
+                backgroundColor: colors.notification,
+                color: colors.notificationContrast,
+                padding: 5,
+              }}
+              onPress={() => Linking.openURL(website)}
+            >
+              <Text style={{ fontFamily: fonts.italic, fontSize: 14, textAlign: 'center' }}>
+                {`Check the ${vehicleName}'s site directly.`}
+              </Text>
+            </Pressable>
+            )}
           </View>
-          <View style={{
-            borderRadius: 5, width: 10, height: 10, backgroundColor: '#ffffff', top: -5, left: 20, bottomPadding: -5,
-          }}
-          />
         </View>
       </Callout>
     </Marker>
@@ -41,10 +82,14 @@ BusStopMarker.propTypes = {
   }).isRequired,
   color: PropTypes.string,
   title: PropTypes.string,
-  eta: PropTypes.number,
+  eta: PropTypes.string,
+  website: PropTypes.string,
+  vehicleName: PropTypes.string,
 };
 BusStopMarker.defaultProps = {
   color: '#000000',
   title: '',
   eta: undefined,
+  website: undefined,
+  vehicleName: 'source',
 };

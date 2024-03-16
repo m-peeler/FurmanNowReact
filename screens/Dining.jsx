@@ -22,6 +22,7 @@ export default function Dining() {
   return (
     <SafeAreaView>
       <Carousel
+        panGestureHandlerProps={{ activeOffsetX: [-10, 10] }}
         snapEnabled
         mode="parallax"
         modeConfig={{
@@ -44,7 +45,14 @@ function DHMenuCard({ meal, stationMenus }) {
   const { colors, fonts } = useTheme();
   return (
     <View style={{
-      borderRadius: 8, padding: 10, margin: 10, backgroundColor: colors.card, flexDirection: 'column',
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.3,
+      shadowOffset: { height: 1 },
+      borderRadius: 8,
+      padding: 10,
+      margin: 10,
+      backgroundColor: colors.card,
+      flexDirection: 'column',
     }}
     >
       <Text style={{
