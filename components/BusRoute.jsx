@@ -11,7 +11,7 @@ function calculateETA(distAway, stopsAway, averageSpeed, updated) {
 
 function writeETAString(eta, vehicleName) {
   const name = vehicleName ? vehicleName.trim() : 'vehicle';
-  const arrivalString = `${((eta.getHours() - 1) % 12) + 1}:${eta.getMinutes() < 10 ? '0' : ''}${eta.getMinutes()} ${eta.getHours() >= 12 && eta.getHours() != 24 ? 'pm' : 'am'}`;
+  const arrivalString = `${((eta.getHours() - 1) % 12) + 1}:${eta.getMinutes() < 10 ? '0' : ''}${eta.getMinutes()} ${eta.getHours() >= 12 && eta.getHours() !== 24 ? 'pm' : 'am'}`;
   const timeTill = Math.floor((eta.getTime() - Date.now()) / (1000 * 60));
   let message = `The ${name} should arrive around ${arrivalString} (${timeTill} minutes from now).`;
   if (timeTill < -0.5) { message = 'I think you missed the bus &#128556;'; }

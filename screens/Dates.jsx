@@ -8,7 +8,7 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
 import arrayPartition from '../utilities/ArrayFunctions';
 import ButtonList from '../components/ButtonList';
-import { parseDate, parseTime } from '../utilities/DateTimeFunctions';
+import { parseDate, parseTime } from '../utilities/DateTimeFunctions.ts';
 import { HourRange, dateCompare } from '../utilities/Scheduling.ts';
 import DateButton from '../components/dates/DateButton';
 

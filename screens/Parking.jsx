@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { Polygon } from 'react-native-maps';
-import { useTheme } from '@react-navigation/native';
-import PropTypes from 'prop-types';
-import { SearchBar } from 'react-native-elements';
 import { decode } from '@googlemaps/polyline-codec';
 import FUNowMapView from '../components/CustomMapView';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';

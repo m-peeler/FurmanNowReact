@@ -3,18 +3,19 @@ import { useTheme } from '@react-navigation/native';
 import {
   Dimensions,
   Pressable,
-  SafeAreaView, Text, View,
+  SafeAreaView, Share, Text, View,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { useHeaderHeight } from '@react-navigation/elements';
 import Carousel from 'react-native-reanimated-carousel';
-import { Availability, useCalendarPermissions } from 'expo-calendar';
+import { useCalendarPermissions } from 'expo-calendar';
+import ContextMenu from 'react-native-context-menu-view';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
 import arrayPartition from '../utilities/ArrayFunctions';
 import ButtonList from '../components/ButtonList';
 import {
-  getDateSuffix, parseDate, parseTime, requestAddEvent,
-} from '../utilities/DateTimeFunctions';
+  getDateSuffix, parseDate, parseTime, requestAddEvent, Event,
+} from '../utilities/DateTimeFunctions.ts';
 import { HourRange } from '../utilities/Scheduling.ts';
 
 function formatDate(date) {
@@ -28,9 +29,9 @@ function formatDate(date) {
 function setupEventData({
   title, description, start, end, date, organizer, location,
 }) {
-  const event = {
+  const event = new Event(
     title,
-    startDate: new Date(
+    new Date(
       date.getFullYear(),
       date.getMonth(),
       date.getDate(),
@@ -38,7 +39,7 @@ function setupEventData({
       start.getMinutes(),
       0,
     ),
-    endDate: new Date(
+    new Date(
       date.getFullYear(),
       date.getMonth(),
       date.getDate(),
@@ -47,10 +48,8 @@ function setupEventData({
       0,
     ),
     location,
-    timeZone: 'America/New_York',
-    notes: `${description}\n Organized by ${organizer}.`,
-    availability: Availability.BUSY,
-  };
+    `${description}\n Organized by ${organizer}.`,
+  );
   return event;
 }
 
@@ -65,75 +64,95 @@ function EventButton({
   const textColor = pressed ? colors.notificationText : colors.text;
   const backColor = pressed ? colors.notification : colors.card;
   return (
-    <Pressable
-      onTouchStart={() => setPressed(true)}
-      onTouchEnd={() => setPressed(false)}
-      onTouchCancel={() => setPressed(false)}
-      onLongPress={() => requestAddEvent(
-        setupEventData({
-          title, description, start, end, date, organizer, location,
-        }),
-        status,
-        requestPermissions,
-      )}
-      onPress={() => setEngaged(!engaged)}
+    <ContextMenu
+      actions={[
+        { title: 'Save to Calendar' },
+        { title: 'Share Event' },
+      ]}
+      onPress={
+        ({ nativeEvent: { name } }) => {
+          switch (name) {
+            case 'Save to Calendar':
+              requestAddEvent(
+                setupEventData({
+                  title, description, start, end, date, organizer, location,
+                }),
+                status,
+                requestPermissions,
+              );
+              break;
+            case 'Share Event':
+              Share.share({ message: `"${title}": ${location}, ${new HourRange(start, end).formatStartEnd()}` });
+              break;
+            default:
+              break;
+          }
+        }
+     }
     >
-      <View style={{
-        backgroundColor: backColor,
-        borderRadius: 8,
-        marginVertical: 5,
-        padding: 5,
-        flexDirection: 'column',
-      }}
+      <Pressable
+        onTouchStart={() => setPressed(true)}
+        onTouchEnd={() => setPressed(false)}
+        onTouchCancel={() => setPressed(false)}
+        onPress={() => setEngaged(!engaged)}
       >
-        <Text style={{
-          fontSize: 24, fontFamily: fonts.bold, color: textColor, textAlign: 'center',
+        <View style={{
+          backgroundColor: backColor,
+          borderRadius: 8,
+          marginVertical: 5,
+          padding: 5,
+          flexDirection: 'column',
         }}
         >
-          {`${title}`}
-        </Text>
-        <View style={{ flexDirection: 'row', alignContent: 'space-between' }}>
           <Text style={{
-            color: textColor, fontFamily: fonts.regular, fontSize: 18, flex: 1,
+            fontSize: 24, fontFamily: fonts.bold, color: textColor, textAlign: 'center',
           }}
           >
-            {formatDate(date)}
+            {`${title}`}
           </Text>
+          <View style={{ flexDirection: 'row', alignContent: 'space-between' }}>
+            <Text style={{
+              color: textColor, fontFamily: fonts.regular, fontSize: 18, flex: 1,
+            }}
+            >
+              {formatDate(date)}
+            </Text>
+            <Text style={{
+              color: textColor, fontFamily: fonts.regular, fontSize: 18, flex: 1, textAlign: 'right',
+            }}
+            >
+              {hourRange.formatStartEnd()}
+            </Text>
+          </View>
           <Text style={{
-            color: textColor, fontFamily: fonts.regular, fontSize: 18, flex: 1, textAlign: 'right',
+            textAlign: 'center', color: textColor, fontFamily: fonts.italic, fontSize: 12,
           }}
           >
-            {hourRange.formatStartEnd()}
+            {`Located in ${location}`}
           </Text>
-        </View>
-        <Text style={{
-          textAlign: 'center', color: textColor, fontFamily: fonts.italic, fontSize: 12,
-        }}
-        >
-          {`Located in ${location}`}
-        </Text>
-        <Text
-          numberOfLines={engaged ? undefined : 2}
-          ellipsizeMode="tail"
-          style={{
+          <Text
+            numberOfLines={engaged ? undefined : 2}
+            ellipsizeMode="tail"
+            style={{
 
-            color: textColor,
-            fontFamily: fonts.regular,
-            fontSize: 14,
-          }}
-        >
-          {`\t${description}`}
-        </Text>
-        { engaged && (
+              color: textColor,
+              fontFamily: fonts.regular,
+              fontSize: 14,
+            }}
+          >
+            {`\t${description}`}
+          </Text>
+          { engaged && (
           <Text style={{
             textAlign: 'center', color: textColor, fontFamily: fonts.italic, fontSize: 16,
           }}
           >
             {`Organized by ${organizer}`}
           </Text>
-        )}
-      </View>
-    </Pressable>
+          )}
+        </View>
+      </Pressable>
+    </ContextMenu>
   );
 }
 EventButton.propTypes = {

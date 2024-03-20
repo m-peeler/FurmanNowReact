@@ -46,16 +46,16 @@ function formatOpponent(item) {
 }
 
 function setupEventData(item) {
-  const event = {
-    title: `Furman ${item.sportTitle} ${locIndText(item.location_indicator)} ${item.opponent}`,
-    startDate: item.eventdate,
-    endDate: new Date(item.eventdate.getTime() + (2 * 60 * 60 * 1000)),
-    location: item.location,
-    allDay: item.allDay,
-    timeZone: 'America/New_York',
-    notes: `Go Furman ${item.sportTitle}! Roll Dins!`,
-    availability: Calendar.Availability.BUSY,
-  };
+  const event = new Event(
+    `Furman ${item.sportTitle} ${locIndText(item.location_indicator)} ${item.opponent}`,
+    item.eventdate,
+    new Date(item.eventdate.getTime() + (2 * 60 * 60 * 1000)),
+    item.location,
+    item.allDay,
+    `Go Furman ${item.sportTitle}! Roll Dins!`,
+    'America/New_York',
+    Calendar.Availability.BUSY,
+  );
   return event;
 }
 
