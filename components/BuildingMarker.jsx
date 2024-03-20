@@ -35,6 +35,8 @@ export default function BuildingMarker({
       ? (
         <Polygon
           key={`${name} Shape`}
+          accessible
+          accessibilityLabel={`${name} location marker.`}
           coordinates={decode(polyline, 5).map(
             (point) => ({ latitude: point[0], longitude: point[1] }),
           )}
@@ -45,7 +47,17 @@ export default function BuildingMarker({
           strokeWidth={4}
         />
       )
-      : <Marker key={`${name} Marker`} coordinate={coordinate} title={name} />
+      : (
+        <Marker
+          accesssible
+          accessibilityLabel={`${name} location marker.`}
+          key={`${name} Marker`}
+          coordinate={coordinate}
+          title={name}
+          onSelect={onPress}
+          onPress={onPress}
+        />
+      )
   );
 }
 BuildingMarker.propTypes = {

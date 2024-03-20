@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import PropTypes from 'prop-types';
+import { FlashList } from '@shopify/flash-list';
+import { useHeaderHeight } from '@react-navigation/elements';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
 import arrayPartition from '../utilities/ArrayFunctions';
 
@@ -22,6 +24,7 @@ export default function Dining() {
   return (
     <SafeAreaView>
       <Carousel
+        loop={false}
         panGestureHandlerProps={{ activeOffsetX: [-10, 10] }}
         snapEnabled
         mode="parallax"
@@ -42,42 +45,65 @@ export default function Dining() {
 }
 
 function DHMenuCard({ meal, stationMenus }) {
-  const { colors, fonts } = useTheme();
-  return (
-    <View style={{
-      shadowColor: colors.shadow,
-      shadowOpacity: 0.3,
-      shadowOffset: { height: 1 },
+  const { colors, fonts, styling } = useTheme();
+  const header = useHeaderHeight();
+  console.log(header);
+  const styles = {
+    card: {
       borderRadius: 8,
       padding: 10,
       margin: 10,
       backgroundColor: colors.card,
       flexDirection: 'column',
-    }}
-    >
-      <Text style={{
-        textAlign: 'center', fontSize: 24, fontFamily: fonts.heading, color: colors.text,
-      }}
-      >
+      height: Dimensions.get('window').height - header - 20,
+      ...styling.shadows,
+    },
+    heading: {
+      textAlign: 'center',
+      fontSize: 24,
+      fontFamily: fonts.heading,
+      color: colors.text,
+    },
+    station: {
+      fontSize: 24,
+      fontFamily: fonts.bold,
+      color: colors.notificationContrast,
+    },
+    stationBox: {
+      borderRadius: 10,
+      backgroundColor: colors.notification,
+      padding: 5,
+      margin: 5,
+    },
+    foodItem: {
+      padding: 5,
+      fontSize: 16,
+      fontFamily: fonts.regular,
+      color: colors.text,
+    },
+  };
+  return (
+    <View style={styles.card}>
+      <Text style={styles.heading}>
         {meal}
       </Text>
-      {stationMenus.map(
-        ([station, entries]) => (
+      <FlashList
+        data={stationMenus}
+        renderItem={({ item: [station, entries] }) => (
           <View>
-            <Text style={{ fontSize: 16, fontFamily: fonts.regular, color: colors.text }}>
-              {`${station}`}
-            </Text>
+            <View style={styles.stationBox}>
+              <Text style={styles.station}>
+                {`${station}`}
+              </Text>
+            </View>
             { entries.map(({ itemName }) => (
-              <Text style={{
-                paddingLeft: 10, fontSize: 16, fontFamily: fonts.regular, color: colors.text,
-              }}
-              >
+              <Text style={styles.foodItem}>
                 {itemName}
               </Text>
             ))}
           </View>
-        ),
-      )}
+        )}
+      />
     </View>
   );
 }

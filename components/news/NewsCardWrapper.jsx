@@ -7,9 +7,9 @@ import ContextMenu from 'react-native-context-menu-view';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 export default function NewsCardWrapper({
-  children, height, width, color, publisher, publisherLink, link, title,
+  children, height, width, color, publisher, publisherLink, link, headline,
 }) {
-  const { colors } = useTheme();
+  const { styling } = useTheme();
   const style = {
     borderRadius: 10,
     backgroundColor: color,
@@ -17,51 +17,44 @@ export default function NewsCardWrapper({
     marginHorizontal: 5,
     height: height - 2 * 5,
     width: width - 2 * 5,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.2,
-    elevation: 5,
+    ...styling.shadows,
   };
+  const publisherActions = [
+    { title: `Visit ${publisher}` },
+    { title: 'Copy Website' },
+    { title: 'Share Website' },
+  ];
+  const articleActions = [
+    { title: 'Share News' },
+    { title: 'Copy News Link' },
+    {
+      title: `${publisher}`,
+      actions: publisherActions,
+    },
+  ];
   return (
     <ContextMenu
-      actions={
-      [{ title: 'Share News' },
-        { title: 'Copy News Link' },
-        {
-          title: `${publisher}`,
-          actions: [
-            { title: `Visit ${publisher}` },
-            { title: 'Copy Website' },
-            { title: 'Share Website' }],
-        },
-      ]
-}
+      actions={link && link !== '' ? articleActions : publisherActions}
       onPress={({ nativeEvent }) => {
-        const { indexPath } = nativeEvent;
-        switch (indexPath[0]) {
-          case 0:
+        const { name } = nativeEvent;
+        switch (name) {
+          case 'Share News':
             Share.share({
               message:
-          `"${title}" – ${link}\n\nArticle from ${publisher}, through the Furman Now! app.`,
+          `"${headline}" – ${link}\n\nArticle from ${publisher}, through the Furman Now! app.`,
             });
             break;
-          case 1:
+          case 'Copy News Link':
             Clipboard.setString(link);
             break;
-          case 2:
-            switch (indexPath[1]) {
-              case 0:
-                Linking.openURL(publisherLink);
-                break;
-              case 1:
-                Clipboard.setString(`${publisherLink}`);
-                break;
-              case 2:
-                Share.share({ message: `Check out ${publisher}: ${publisherLink}\nShared from the Furman Now! app.` });
-                break;
-              default:
-                break;
-            }
+          case `Visit ${publisher}`:
+            Linking.openURL(publisherLink);
+            break;
+          case 'Copy Website':
+            Clipboard.setString(`${publisherLink}`);
+            break;
+          case 'Share Website':
+            Share.share({ message: `Check out ${publisher}: ${publisherLink}\nShared from the Furman Now! app.` });
             break;
           default:
             break;
@@ -78,12 +71,16 @@ NewsCardWrapper.propTypes = {
   height: PropTypes.number.isRequired,
   width: PropTypes.number.isRequired,
   color: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  link: PropTypes.string.isRequired,
   publisher: PropTypes.string.isRequired,
   publisherLink: PropTypes.string.isRequired,
   children: PropTypes.oneOfType([
     PropTypes.node,
     PropTypes.arrayOf(PropTypes.node),
   ]).isRequired,
+  link: PropTypes.string,
+  headline: PropTypes.string,
+};
+NewsCardWrapper.defaultProps = {
+  link: undefined,
+  headline: undefined,
 };

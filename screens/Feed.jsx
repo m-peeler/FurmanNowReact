@@ -1,16 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View, FlatList,
   Dimensions,
-  Platform,
+  Image, Text,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import Carousel from 'react-native-reanimated-carousel';
+import { useTheme } from '@react-navigation/native';
 import Page from '../utilities/Page';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
 import { parseDatetime } from '../utilities/DateTimeFunctions';
 import NewsYoutubeCard from '../components/news/NewsYoutubeCard';
 import NewsLinkCard from '../components/news/NewsLinkCard';
+import NewsCardWrapper from '../components/news/NewsCardWrapper';
+import ARROW from '../assets/icon/creatype-arrow.png';
 
 function datesAreWithin(first, second, milliseconds) {
   return Math.abs(first.getTime() - second.getTime()) < milliseconds;
@@ -81,17 +84,118 @@ NewsItemCard.defaultProps = {
   imageLink: undefined,
   section: undefined,
 };
+function NewsStackFrontCard({
+  cardWidth, cardHeight, articles, publisher,
+}) {
+  const haveLinks = articles
+    .filter((entry) => 'imagelink' in entry && entry.imagelink);
+  const index = Math.floor(Math.random() * haveLinks.length);
+  const [frontArticle, setFrontArticle] = useState(
+    index < haveLinks.length ? haveLinks[index] : undefined,
+  );
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFrontArticle(haveLinks[Math.floor(Math.random() * haveLinks.length)]);
+    }, 15_000);
+    return () => { clearInterval(interval); };
+  }, [haveLinks]);
+
+  const { colors, fonts } = useTheme();
+  return (
+    <NewsCardWrapper
+      height={cardHeight}
+      width={cardWidth}
+      publisher={publisher.name}
+      publisherLink={publisher.link}
+      color={colors.card}
+    >
+      <Image style={{ height: '100%', width: '100%', borderRadius: 10 }} source={{ uri: frontArticle ? frontArticle.imagelink : '' }} />
+      <View style={{
+        height: '100%', width: '100%', position: 'absolute', justifyContent: 'flex-end',
+      }}
+      >
+        <View style={{
+          margin: 10, padding: 5, borderRadius: 4, backgroundColor: `${colors.card}88`,
+        }}
+        >
+          <Text style={{ fontFamily: fonts.italic, color: colors.text }}>
+            {`${frontArticle ? `"${frontArticle.title}", by ${frontArticle.author}` : ''}`}
+          </Text>
+        </View>
+      </View>
+      <View style={{
+        width: '40%', position: 'absolute', left: 0, borderTopLeftRadius: 10, borderBottomRightRadius: 10, backgroundColor: colors.card,
+      }}
+      >
+        <Text style={{
+          fontFamily: fonts.bold, color: colors.text, fontSize: 18, textAlign: 'center', padding: 5,
+        }}
+        >
+          {`There are new posts from ${publisher.name}!`}
+        </Text>
+        <Text style={{
+          fontFamily: fonts.regular, color: colors.text, padding: 5, textAlign: 'center',
+        }}
+        >
+          Swipe to see more, or hold down to share.
+        </Text>
+        <Image
+          source={ARROW}
+          style={{
+            transform: [{ rotate: '-90deg' }], marginLeft: 60, marginVertical: -20, width: 30, height: 100, tintColor: colors.text,
+          }}
+        />
+      </View>
+    </NewsCardWrapper>
+  );
+}
+NewsStackFrontCard.propTypes = {
+  cardWidth: PropTypes.number.isRequired,
+  cardHeight: PropTypes.number.isRequired,
+  articles: PropTypes.arrayOf(PropTypes.shape({
+    imagelink: PropTypes.string,
+  })).isRequired,
+  publisher: PropTypes.shape({
+    name: PropTypes.string,
+    link: PropTypes.string,
+    image: PropTypes.string,
+  }).isRequired,
+};
 
 function NewsCardStack({
   cardWidth, cardHeight, articles, sources,
 }) {
-  const isAndroid = Platform.OS === 'android';
+  const artCards = articles.map((entry) => (
+    <NewsItemCard
+      height={cardHeight}
+      width={cardWidth}
+      title={entry.title}
+      link={entry.linktocontent}
+      date={entry.date}
+      publisher={sources[entry.publisherID].name}
+      publisherLink={sources[entry.publisherID].link}
+      publisherImageLink={sources[entry.publisherID].image}
+      mediaType={entry.media}
+      author={entry.author}
+      section={entry.section}
+      imageLink={entry.imagelink}
+      description={entry.description}
+    />
+  ));
+  artCards.unshift(
+    <NewsStackFrontCard
+      cardWidth={cardWidth}
+      cardHeight={cardHeight}
+      articles={articles}
+      publisher={sources[articles[0].publisherID]}
+    />,
+  );
   return (
     <Carousel
-      loop
+      loop={false}
       snapEnabled
       {...{
-        mode: isAndroid ? 'vertical-stack' : 'vertical-stack',
+        mode: 'vertical-stack',
         modeConfig: {
           showLength: 3,
           stackInterval: cardHeight * 0.1,
@@ -102,24 +206,10 @@ function NewsCardStack({
       }
       }
       width={cardWidth}
-      data={articles}
-      height={cardHeight * (isAndroid ? 1 : 1.2)}
+      data={artCards}
+      height={cardHeight * 1.2}
       renderItem={({ item: entry }) => (
-        <NewsItemCard
-          height={cardHeight}
-          width={cardWidth}
-          title={entry.title}
-          link={entry.linktocontent}
-          date={entry.date}
-          publisher={sources[entry.publisherID].name}
-          publisherLink={sources[entry.publisherID].link}
-          publisherImageLink={sources[entry.publisherID].image}
-          mediaType={entry.media}
-          author={entry.author}
-          section={entry.section}
-          imageLink={entry.imagelink}
-          description={entry.description}
-        />
+        entry
       )}
       panGestureHandlerProps={{
         activeOffsetX: [-10, 10],
@@ -153,7 +243,7 @@ function collateSources(articles) {
     if (current
       && current[0].publisherID === entry.publisherID
       && datesAreWithin(entry.date, current[0].date, 1000 * 60 * 3)) {
-      current.push(entry);
+      current.unshift(entry);
     } else {
       if (current) collation.push(current.length > 1 ? current : current[0]);
       current = [entry];

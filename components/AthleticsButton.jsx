@@ -195,9 +195,8 @@ export default function AthleticsButton({ event }) {
   displayState = event.noplayText !== '' ? 'Noplay' : displayState;
 
   let contextMenuMessage = 'Share the Game';
-  contextMenuMessage = displayState === 'Results' ? 'Share the Recap' : contextMenuMessage;
+  contextMenuMessage = displayState === 'Result' ? 'Share the Recap' : contextMenuMessage;
   contextMenuMessage = displayState === 'Noplay' ? 'Share the Cancellation' : contextMenuMessage;
-
   return (
     <ContextMenu
       actions={[

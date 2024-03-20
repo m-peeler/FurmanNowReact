@@ -51,7 +51,7 @@ export default function BusStopMarker(props) {
             </Text>
             {eta
               && (
-              <Text style={{ fontFamily: fonts.regular, fontSize: 18, paddingBottom: 4 }}>
+              <Text style={{ fontFamily: fonts.regular, fontSize: 15, paddingBottom: 4 }}>
                 {eta}
               </Text>
               )}

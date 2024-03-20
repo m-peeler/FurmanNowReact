@@ -48,6 +48,14 @@ const DefaultTheme = {
     notificationText: palette.furmanWhite,
     shadow: palette.black,
   },
+  styling: {
+    shadows: {
+      shadowColor: palette.black,
+      shadowOffset: { width: 1, height: 1 },
+      shadowOpacity: 0.2,
+      elevation: 5,
+    },
+  },
 };
 
 const DarkTheme = {
@@ -66,6 +74,14 @@ const DarkTheme = {
     notification: palette.furmanCompYellow,
     notificationText: palette.black,
     shadow: palette.furmanWhite,
+  },
+  styling: {
+    shadows: {
+      shadowColor: palette.furmanWhite,
+      shadowOffset: { width: 1, height: 1 },
+      shadowOpacity: 0.2,
+      elevation: 5,
+    },
   },
 };
 

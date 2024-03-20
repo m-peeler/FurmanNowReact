@@ -156,6 +156,8 @@ export enum DaysOfWeek {
          return `${HourRange.formatTimeNums(this.end)} ${HourRange.hoursToAm(this.end)}`;
       } else if (this.end == null) {
          return `${HourRange.formatTimeNums(this.start)} ${HourRange.hoursToAm(this.start)}`;
+      } else if (timeCompare(this.start, this.end) == 0) {
+         return `${HourRange.formatTimeNums(this.start)} ${HourRange.hoursToAm(this.start)}`;
       }
       return `${HourRange._formatHourRange(this)}`;
     }
@@ -169,7 +171,8 @@ export enum DaysOfWeek {
     
       let stStr = HourRange.formatTimeNums(hourRange.start);
       let edStr = HourRange.formatTimeNums(hourRange.end);
- 
+
+      if (hourRange.start == hourRange.end) return `${stStr} ${startam}`; 
       return `${stStr} ${startam} to ${edStr} ${endam}`
     }
  

@@ -112,7 +112,7 @@ const FUNowMapView = forwardRef((props, ref) => {
       </View>
     </SafeAreaView>
   );
-})
+});
 FUNowMapView.propTypes = {
   zoom: PropTypes.number,
   children: PropTypes.oneOfType([
@@ -120,13 +120,13 @@ FUNowMapView.propTypes = {
     PropTypes.node,
   ]),
   onPress: PropTypes.func,
-  ref: PropTypes.shape({}),
+  onRegionChange: PropTypes.func,
 };
 FUNowMapView.defaultProps = {
   zoom: 1,
   children: null,
   onPress: undefined,
-  ref: undefined,
+  onRegionChange: undefined,
 };
 
 export default FUNowMapView;

@@ -150,7 +150,7 @@ EventButton.defaultProps = {
 };
 
 function EventsDisplay({ name, events }) {
-  const { colors, fonts } = useTheme();
+  const { colors, fonts, styling } = useTheme();
   const { height, width } = Dimensions.get('window');
   const header = useHeaderHeight();
   return (
@@ -162,6 +162,7 @@ function EventsDisplay({ name, events }) {
           width: width * 0.925,
           backgroundColor: colors.card,
           marginHorizontal: width * 0.025,
+          ...styling.shadows,
         }}
         estimatedItemSize={30}
         data={[name, ...events]}

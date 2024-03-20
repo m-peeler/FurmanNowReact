@@ -53,7 +53,7 @@ export default function NewsYoutubeCard(
       height={height}
       width={width}
       color={colors.card}
-      title={title}
+      headline={title}
       link={link}
       publisher={publisher}
       publisherLink={publisherLink}

@@ -18,6 +18,7 @@ export default function NewsLinkCard({
 }) {
   const { colors, fonts } = useTheme();
   const [pressed, setPressed] = useState(false);
+
   const textColor = pressed ? colors.notificationText : colors.text;
   const cardColor = pressed ? colors.notification : colors.card;
   const titleFont = fonts.bold;
@@ -86,14 +87,14 @@ export default function NewsLinkCard({
         color={cardColor}
         height={height}
         width={width}
-        title={title}
+        headline={title}
         link={link}
         publisher={publisher}
         publisherLink={publisherLink}
       >
         <Image
           style={styles.image}
-          source={imageLink && imageLink !== '' ? { uri: imageLink } : undefined}
+          source={imageLink && imageLink !== '' ? { uri: imageLink } : { uri: publisherImageLink }}
         />
         <View style={styles.titleBox}>
           <Text style={styles.title}>

@@ -3,7 +3,7 @@ import { Platform, View } from 'react-native';
 import { parseDatetime } from '../utilities/DateTimeFunctions';
 import FUNowMapView from '../components/CustomMapView';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
-import BusRoute from '../components/BusRoutePolyline';
+import BusRoute from '../components/BusRoute';
 import BusMarker from '../components/transit/BusMarker';
 
 export default function Transit() {
@@ -48,10 +48,14 @@ export default function Transit() {
             },
             distFromStart: parseFloat(stop.distFromStart),
             name: stop.stopName,
-            distFromVehicle: stop.distFromVehicle ? parseFloat(stop.distFromVehicle) : undefined,
-            updated: stop.updated ? parseDatetime(stop.updated) : undefined,
+            distFromVehicle: stop.distFromVehicle !== undefined
+              ? parseFloat(stop.distFromVehicle)
+              : undefined,
+            updated: stop.updated !== undefined ? parseDatetime(stop.updated) : undefined,
             vehicleStopsUntil:
-                stop.vehicleStopsUntil ? parseInt(stop.vehicleStopsUntil, 10) : undefined,
+              stop.vehicleStopsUntil !== undefined
+                ? parseInt(stop.vehicleStopsUntil, 10)
+                : undefined,
           }),
         );
         return par;
@@ -90,7 +94,7 @@ export default function Transit() {
       >
         {pulledRoutes !== undefined
           && pulledRoutes.map(({
-            color, routePolyline, name, vehicleIndex, website,
+            color, routePolyline, name, vehicleIndex, website, averageSpeed,
           }) => (
             <BusRoute
               key={name}
@@ -98,13 +102,14 @@ export default function Transit() {
               website={website}
               color={color}
               route={routePolyline}
+              averageSpeed={parseFloat(averageSpeed)}
               stops={liveStops ? liveStops.filter(({ lineID }) => lineID === vehicleIndex) : []}
             />
           ))}
         {vehicles
             && vehicles.map(
               ({
-                coordinate, vehicle, vehicleIndex, heading,
+                coordinate, vehicle, id, heading,
               }) => {
                 if (coordinate.latitude && coordinate.longitude) {
                   return (
@@ -113,7 +118,7 @@ export default function Transit() {
                       name={vehicle}
                       color={pulledRoutes
                         ? pulledRoutes.filter(
-                          ({ id }) => id === vehicleIndex,
+                          ({ vehicleIndex }) => id === vehicleIndex,
                         ).map(({ color }) => color)[0]
                         : undefined}
                       coordinate={coordinate}

@@ -61,7 +61,7 @@ export default function Map() {
 
   return (
     <View style={{ flex: 1 }}>
-      <FUNowMapView onPress={() => { console.log('bye', displaying); setQualifiedDisplaying(undefined); }}>
+      <FUNowMapView onPress={() => { setQualifiedDisplaying(undefined); }}>
         {buildings !== undefined
         && buildings.filter((building) => (
           (building.name && building.name.toLowerCase().includes(search.toLowerCase()))

@@ -26,6 +26,7 @@ import BUS from './assets/icon/icon-bus.png';
 import BENCH from './assets/icon/bench-freepik.png';
 import LINK from './assets/icon/icon-link.png';
 import Transit from './screens/Transit';
+import Parking from './screens/Parking';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,7 +42,7 @@ const pages = [
   [new Page(7, 'Transit', { category: catHome, icon: BUS }), Transit],
   [new Page(8, 'Health', { category: catHome, icon: CADUCEUS }), Health],
   [new Page(9, 'Dates', { category: catHome, icon: DATES }), Dates],
-  [new Page(10, 'Parking', { category: catHome, icon: PARKING }), Blank],
+  [new Page(10, 'Parking', { category: catHome, icon: PARKING }), Parking],
   [new Page(11, 'Links', { category: catHome, icon: LINK }), Blank],
   [new Page(12, 'Benches', { category: catHome, icon: BENCH }), Blank],
 ];

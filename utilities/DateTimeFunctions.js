@@ -150,3 +150,7 @@ export function requestAddEvent(event, status, requestPermissions) {
     ],
   );
 }
+
+export function basicStringDate(date) {
+  return `${date.toLocaleString('en-US', { weekday: 'short' })}. ${date.toLocaleString('en-US', { month: 'long', day: 'numeric' })}${getDateSuffix(date)}, ${date.getFullYear()}`;
+}
