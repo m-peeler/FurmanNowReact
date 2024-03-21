@@ -291,7 +291,7 @@ export function AthleticsHeading({ heading, date }) {
       fontFamily: fonts.heading,
       fontSize: 28,
       color: colors.notificationContrast,
-      flex: 2,
+      flex: 1,
     },
     headingDate: {
       fontFamily: fonts.italic,

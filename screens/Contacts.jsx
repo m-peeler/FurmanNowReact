@@ -1,76 +1,19 @@
 import {
-  Linking, Text, View, Dimensions, Alert,
+  Linking, Text, View, Dimensions,
 } from 'react-native';
 import React from 'react';
 import { useTheme } from '@react-navigation/native';
 import { useHeaderHeight } from '@react-navigation/elements';
-import * as NativeContact from 'expo-contacts';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '../components/Button';
 import ButtonList from '../components/ButtonList';
 import useContacts from '../hooks/useContacts';
+import { Contact, formatPhoneNumber, requestAddAlert } from '../utilities/ContactFunctions.ts';
 
 // Sets the priorityLevel threshold at which a button will
 // recieve the emergency coloration and be placed on the
 // emergency list at the top.
 const emergencyThreshold = 30;
-
-function formatPhoneNumber(phone) {
-  if (phone.length !== 10) {
-    return null;
-  }
-  const areaCode = phone.slice(0, 3);
-  const firstHalf = phone.slice(3, 6);
-  const secondHalf = phone.slice(6, 10);
-  return `(${areaCode}) ${firstHalf}-${secondHalf}`;
-}
-
-const saveContact = async (item) => {
-  const perms = await NativeContact.getPermissionsAsync();
-  let { status } = perms;
-  const { canAskAgain } = perms;
-  const contact = {
-    [NativeContact.Fields.Name]: item.name,
-    [NativeContact.Fields.PhoneNumbers]: [{
-      number: formatPhoneNumber(item.number),
-      isPrimary: true,
-      digits: item.number.toString(),
-      countryCode: 'US',
-      label: 'mobile',
-    }],
-    [NativeContact.Fields.Company]: 'Furman University',
-  };
-
-  if (status !== NativeContact.PermissionStatus.GRANTED && canAskAgain) {
-    const request = await NativeContact.requestPermissionsAsync();
-    status = request.status;
-  }
-
-  if (status !== NativeContact.PermissionStatus.GRANTED) {
-    return;
-  }
-
-  try {
-    await NativeContact.addContactAsync(contact)
-      .then(Alert.alert('Completed', `Successfully added ${item.name} to your contacts.`))
-      .catch((err) => {
-        console.log(err);
-      });
-  } catch (e) {
-    console.log(e);
-  }
-};
-
-function requestAddAlert(item) {
-  Alert.alert(
-    'Add Contact?',
-    `Would you like to add ${item.name} to your contact book?`,
-    [
-      { text: 'Cancel', onPress: () => {} },
-      { text: 'Ok', onPress: () => saveContact(item), isPreferred: true },
-    ],
-  );
-}
 
 const renderFront = (item) => function frontCurried(styles) {
   const {
@@ -146,7 +89,7 @@ const renderItem = (colors, fonts) => function renderCurried({ item }) {
 
   return (
     <Button
-      onLongPress={(() => requestAddAlert(item))}
+      onLongPress={(() => requestAddAlert(new Contact(item.name, item.number)))}
       delayLongPress={650}
       onPress={() => { Linking.openURL(`tel:${item.number}`); }}
       styles={styles}
