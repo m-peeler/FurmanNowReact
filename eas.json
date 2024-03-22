@@ -6,7 +6,9 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      
+      "android" : {
+        "image" : "latest"
+      }
     },
     "development-simulator": {
       "developmentClient": true,

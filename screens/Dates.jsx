@@ -5,39 +5,13 @@ import {
 } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import { useHeaderHeight } from '@react-navigation/elements';
-import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
-import arrayPartition from '../utilities/ArrayFunctions';
 import ButtonList from '../components/ButtonList';
-import { parseDate, parseTime } from '../utilities/DateTimeFunctions.ts';
-import { HourRange, dateCompare } from '../utilities/Scheduling.ts';
 import DateButton from '../components/dates/DateButton';
+import useImportantDates from '../hooks/useImportantDates';
 
 export default function Dates() {
   const { colors, fonts, styling } = useTheme();
-  const [data] = useDataLoadFetchCache(
-    'https://cs.furman.edu/~csdaemon/FUNow/importantDateGet.php',
-    'DATA:Dates-Cache',
-    (resp) => {
-      if (resp.results === undefined) return undefined;
-      const parsed = resp.results.map(({
-        date, startTime, endTime, ...rest
-      }) => (
-        {
-          ...rest,
-          date: parseDate(date),
-          timeRange: new HourRange(parseTime(startTime), parseTime(endTime)),
-        }
-      ));
-      return Object.entries(
-        arrayPartition(parsed, 'category'),
-      ).sort(([k1], [k2]) => k1.localeCompare(k2))
-        .map(([key, value]) => [
-          key,
-          value.sort(({ date: d1 }, { date: d2 }) => dateCompare(d1, d2)),
-        ]);
-    },
-  );
-
+  const [data] = useImportantDates();
   const header = useHeaderHeight();
   return (
     <SafeAreaView>

@@ -11,13 +11,15 @@ function partitionByTimeRange(json) {
   });
   const today = new Date(Date.now());
   const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
   const partitioned = arrayPartition(parsed, (item) => {
     const comparedToToday = dateCompare(item.eventdate, today);
     if (comparedToToday < 0 || item.resultStatus !== '') return 'Results';
     if (comparedToToday === 0) return 'Today';
-    const comparedToTomorrow = dateCompare(item.eventdate, tomorrow);
-    if (comparedToTomorrow === 0) return 'Tomorrow';
-    return 'This Week';
+    if (dateCompare(item.eventdate, tomorrow) === 0) return 'Tomorrow';
+    if (dateCompare(item.eventdate, nextWeek) < 0) return 'This';
+    return 'Next';
   });
   const compForSort = (a, b) => (a.eventdate > b.eventdate) - (a.eventdate < b.eventdate);
   let output = [];
@@ -36,9 +38,13 @@ function partitionByTimeRange(json) {
       ? [{ heading: 'TOMORROW', date: tomorrow },
         ...partitioned.Tomorrow.sort(compForSort)]
       : []),
-    ...(partitioned['This Week'] !== undefined
+    ...(partitioned.This !== undefined
       ? [{ heading: 'THIS WEEK' },
-        ...partitioned['This Week'].sort(compForSort)]
+        ...partitioned.This.sort(compForSort)]
+      : []),
+    ...(partitioned.Next !== undefined
+      ? [{ heading: 'NEXT WEEK' },
+        ...partitioned.Next.sort(compForSort)]
       : []),
   ];
   return output;

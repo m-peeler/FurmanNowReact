@@ -7,17 +7,13 @@ import {
 import YoutubePlayer from 'react-native-youtube-iframe';
 import NewsCardWrapper from './NewsCardWrapper';
 import NewsLinkCard from './NewsLinkCard';
+import { Article } from '../../utilities/ArticleFunctions.ts';
 
 export default function NewsYoutubeCard(
   {
     height,
     width,
-    title,
-    description,
-    author,
-    date,
-    section,
-    link,
+    article,
     publisher,
     publisherLink,
     publisherImageLink,
@@ -25,21 +21,14 @@ export default function NewsYoutubeCard(
 ) {
   const [pressed, setPressed] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const videoID = link.split('/').at(-1);
+  const videoID = article.link.split('/').at(-1);
   const { colors, fonts } = useTheme();
-  const thumbnail = `https://i.ytimg.com/vi/${videoID}/hqdefault.jpg`;
   const playerPadding = 10;
   const normalCard = (
     <NewsLinkCard
       height={height}
       width={width}
-      title={title}
-      description={description}
-      author={author}
-      date={date}
-      section={section}
-      link={link}
-      imageLink={thumbnail}
+      article={article}
       publisher={publisher}
       publisherLink={publisherLink}
       publisherImageLink={publisherImageLink}
@@ -53,8 +42,8 @@ export default function NewsYoutubeCard(
       height={height}
       width={width}
       color={colors.card}
-      headline={title}
-      link={link}
+      headline={article.title}
+      link={article.link}
       publisher={publisher}
       publisherLink={publisherLink}
     >
@@ -91,7 +80,7 @@ export default function NewsYoutubeCard(
               color: colors.text,
             }}
           >
-            {title}
+            {article.title}
           </Text>
         </Pressable>
       </View>
@@ -104,19 +93,11 @@ export default function NewsYoutubeCard(
 NewsYoutubeCard.propTypes = {
   height: PropTypes.number.isRequired,
   width: PropTypes.number.isRequired,
-  title: PropTypes.string.isRequired,
-  link: PropTypes.string.isRequired,
-  date: PropTypes.instanceOf(Date).isRequired,
+  article: PropTypes.instanceOf(Article).isRequired,
   publisher: PropTypes.string.isRequired,
   publisherLink: PropTypes.string.isRequired,
   publisherImageLink: PropTypes.string,
-  description: PropTypes.string,
-  section: PropTypes.string,
-  author: PropTypes.string,
 };
 NewsYoutubeCard.defaultProps = {
   publisherImageLink: undefined,
-  description: undefined,
-  author: undefined,
-  section: undefined,
 };

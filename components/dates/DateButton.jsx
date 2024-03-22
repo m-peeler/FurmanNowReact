@@ -51,7 +51,7 @@ export default function DateButton({
       }}
     >
       <View style={{
-        ...styling.shadows, borderRadius: 5, backgroundColor: colors.card, margin: 5, padding: 5
+        ...styling.shadows, borderRadius: 5, backgroundColor: colors.card, margin: 5, padding: 5,
       }}
       >
         <Text style={{ fontFamily: fonts.bold, fontSize: 18, color: colors.text }}>

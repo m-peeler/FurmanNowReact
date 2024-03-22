@@ -6,7 +6,7 @@ import {
 import Carousel from 'react-native-reanimated-carousel';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
 import arrayPartition from '../utilities/ArrayFunctions';
-import { EventsDisplay } from '../components/EventsDisplay';
+import EventsDisplay from '../components/EventsDisplay';
 
 export default function Events() {
   const [data] = useDataLoadFetchCache(

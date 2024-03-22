@@ -13,6 +13,14 @@ import { useHeaderHeight } from '@react-navigation/elements';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
 import arrayPartition from '../utilities/ArrayFunctions';
 
+function calcDefaultIndex() {
+  const time = new Date(Date.now());
+  if (time.getHours() < 11) return 0;
+  if (time.getHours() < 14) return 1;
+  if (time.getHours() < 21) return 2;
+  return 0;
+}
+
 export default function Dining() {
   const [data] = useDataLoadFetchCache(
     'https://cs.furman.edu/~csdaemon/FUNow/dhMenuGet.php',
@@ -25,6 +33,7 @@ export default function Dining() {
     <SafeAreaView>
       <Carousel
         loop={false}
+        defaultIndex={calcDefaultIndex()}
         panGestureHandlerProps={{ activeOffsetX: [-10, 10] }}
         snapEnabled
         mode="parallax"
@@ -47,7 +56,6 @@ export default function Dining() {
 function DHMenuCard({ meal, stationMenus }) {
   const { colors, fonts, styling } = useTheme();
   const header = useHeaderHeight();
-  console.log(header);
   const styles = {
     card: {
       borderRadius: 8,
@@ -88,6 +96,7 @@ function DHMenuCard({ meal, stationMenus }) {
         {meal}
       </Text>
       <FlashList
+        estimatedItemSize={150}
         data={stationMenus}
         renderItem={({ item: [station, entries] }) => (
           <View>

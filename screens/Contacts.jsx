@@ -1,10 +1,12 @@
 import {
   Linking, Text, View, Dimensions,
+  Share,
 } from 'react-native';
 import React from 'react';
 import { useTheme } from '@react-navigation/native';
 import { useHeaderHeight } from '@react-navigation/elements';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import ContextMenu from 'react-native-context-menu-view';
 import Button from '../components/Button';
 import ButtonList from '../components/ButtonList';
 import useContacts from '../hooks/useContacts';
@@ -52,8 +54,10 @@ const renderFront = (item) => function frontCurried(styles) {
   );
 };
 
-const renderItem = (colors, fonts) => function renderCurried({ item }) {
-  const emergency = item.priorityLevel >= emergencyThreshold;
+const renderItem = (colors, fonts) => function renderCurried({
+  item: { name, number, priorityLevel },
+}) {
+  const emergency = priorityLevel >= emergencyThreshold;
   const unpressedText = emergency ? colors.emergencyText : colors.text;
   const unpressedButton = emergency ? colors.emergency : colors.card;
 
@@ -88,16 +92,34 @@ const renderItem = (colors, fonts) => function renderCurried({ item }) {
   });
 
   return (
-    <Button
-      onLongPress={(() => requestAddAlert(new Contact(item.name, item.number)))}
-      delayLongPress={650}
-      onPress={() => { Linking.openURL(`tel:${item.number}`); }}
-      styles={styles}
-      accessibilityLabel={item.name}
-      accessibilityHint={`Press to call ${item.name} at ${item.number}, long press to save their contact.`}
-      front={renderFront(item)}
-      frontResponsive
-    />
+    <ContextMenu
+      actions={[{ title: 'Save to Contacts' },
+        { title: 'Share Contact' },
+      ]}
+      onPress={({ nativeEvent: { name: buttonName } }) => {
+        switch (buttonName) {
+          case 'Save to Contacts':
+            requestAddAlert(new Contact(name, number));
+            break;
+          case 'Share Contact':
+            Share.share({
+              message: `${name}: ${number}`,
+            });
+            break;
+          default:
+            break;
+        }
+      }}
+    >
+      <Button
+        onPress={() => { Linking.openURL(`tel:${number}`); }}
+        styles={styles}
+        accessibilityLabel={name}
+        accessibilityHint={`Press to call ${name} at ${number}, long press to save their contact.`}
+        front={renderFront({ name, number, priorityLevel })}
+        frontResponsive
+      />
+    </ContextMenu>
   );
 };
 

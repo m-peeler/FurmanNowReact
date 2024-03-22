@@ -25,11 +25,13 @@ export class Contact {
 class InsertableContact implements NativeContact.Contact {
   contactType: NativeContact.ContactTypes = NativeContact.ContactTypes.Person;
   name: string;
+  firstName?: string | undefined;
   phoneNumbers: NativeContact.PhoneNumber[];
-  [NativeContact.Fields.Company]: string;
+  company: string;
 
   constructor(contact: Contact) {
     this.name = contact.name;
+    this.firstName = contact.name;
     this.phoneNumbers = [{
       number: formatPhoneNumber(contact.number.toString()),
       isPrimary: true,
@@ -37,7 +39,7 @@ class InsertableContact implements NativeContact.Contact {
       countryCode: 'US',
       label: 'mobile',
     }];
-    this[NativeContact.Fields.Company] = contact.company ? contact.company : 'Furman University';
+    this.company = contact.company ? contact.company : "Furman University";
   }
 }
 
@@ -45,17 +47,20 @@ const saveContact = async (cont : Contact) => {
   const { status, canAskAgain } = await NativeContact.getPermissionsAsync();
   let stat = status;  
   const contact = new InsertableContact(cont);
-
+  console.log(contact);
   if (stat !== NativeContact.PermissionStatus.GRANTED && canAskAgain) {
     ({ status: stat } = await NativeContact.requestPermissionsAsync());
   }
-
+  console.log(2);
   if (stat !== NativeContact.PermissionStatus.GRANTED) return;
 
   try {
-    await NativeContact.addContactAsync(contact)
+    console.log(3);
+    const val = await NativeContact.addContactAsync(contact)
+    console.log(val);
     Alert.alert('Completed', `Successfully added ${contact.name} to your contacts.`)
   } catch (e) {
+    console.log("HELP");
     console.log(e);
   }
 };

@@ -8,7 +8,7 @@ import * as Calendar from 'expo-calendar';
 import { useTheme } from '@react-navigation/native';
 import PropTypes from 'prop-types';
 import ContextMenu from 'react-native-context-menu-view';
-import { isAllDay, requestAddEvent, getDateSuffix } from '../utilities/DateTimeFunctions';
+import { isAllDay, requestAddEvent, getDateSuffix } from '../utilities/DateTimeFunctions.ts';
 
 function locIndText(locationIndicator) {
   switch (locationIndicator) {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import useDataLoadFetchCache, { notEmpty } from './useDataLoadFetchCache';
-import { parseTime } from '../utilities/DateTimeFunctions';
+import { parseTime } from '../utilities/DateTimeFunctions.ts';
 import * as Scheduling from '../utilities/Scheduling.ts';
 import arrayPartition from '../utilities/ArrayFunctions';
 

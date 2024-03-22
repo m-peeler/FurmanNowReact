@@ -46,7 +46,6 @@ export default function Map() {
   const [displaying, setDisplaying] = useState();
 
   const setQualifiedDisplaying = (set) => {
-    console.log(set);
     if (!set) setDisplaying(undefined);
     else if (!displaying || !displaying.name || displaying.name !== set.name) {
       setDisplaying(set);

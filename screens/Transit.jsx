@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Platform, View } from 'react-native';
-import { parseDatetime } from '../utilities/DateTimeFunctions';
+import { parseDatetime } from '../utilities/DateTimeFunctions.ts';
 import FUNowMapView from '../components/CustomMapView';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
 import BusRoute from '../components/BusRoute';

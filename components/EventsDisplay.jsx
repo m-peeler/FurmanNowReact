@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { useHeaderHeight } from '@react-navigation/elements';
 import ButtonList from './ButtonList';
 import { parseDate, parseTime } from '../utilities/DateTimeFunctions.ts';
-import { EventButton } from './EventButton';
+import EventButton from './EventButton';
 
 export default function EventsDisplay({ name, events }) {
   const { colors, fonts, styling } = useTheme();
@@ -14,6 +14,7 @@ export default function EventsDisplay({ name, events }) {
   return (
     <View>
       <ButtonList
+        estimatedItemSize={145}
         style={{
           borderRadius: 8,
           height: (height - header - 25),
@@ -22,7 +23,6 @@ export default function EventsDisplay({ name, events }) {
           marginHorizontal: width * 0.025,
           ...styling.shadows,
         }}
-        estimatedItemSize={30}
         data={[name, ...events]}
         renderItem={({ item }) => {
           if (typeof item === 'string') {

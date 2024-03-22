@@ -4,7 +4,7 @@ import { View, Text, Image } from 'react-native';
 import PropTypes from 'prop-types';
 import { useTheme } from '@react-navigation/native';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
-import { parseDatetime } from '../utilities/DateTimeFunctions';
+import { parseDatetime } from '../utilities/DateTimeFunctions.ts';
 
 function getCurrentImage() {
   const rightNow = new Date(Date.now());

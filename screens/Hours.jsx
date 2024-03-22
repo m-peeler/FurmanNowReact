@@ -165,7 +165,7 @@ HoursButton.propTypes = {
     }).isRequired,
     PropTypes.func,
   ]).isRequired,
-  buttonEngaged: PropTypes.string.isRequired,
+  buttonEngaged: PropTypes.number.isRequired,
 };
 
 function HoursTitleBar({ styles, name, information }) {

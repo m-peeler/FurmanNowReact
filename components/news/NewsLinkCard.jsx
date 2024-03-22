@@ -5,15 +5,15 @@ import {
   View, Pressable, Image, Text, Linking, StyleSheet,
 } from 'react-native';
 import NewsCardWrapper from './NewsCardWrapper';
-import { getDateSuffix } from '../../utilities/DateTimeFunctions';
+import { getDateSuffix } from '../../utilities/DateTimeFunctions.ts';
+import { Article } from '../../utilities/ArticleFunctions.ts';
 
 function dateFormat(date) {
   return `${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}${getDateSuffix(date)}, ${date.getFullYear()}`;
 }
 
 export default function NewsLinkCard({
-  height, width, title, description, author, date, section,
-  link, imageLink, publisher, publisherLink, publisherImageLink,
+  height, width, article, publisher, publisherLink, publisherImageLink,
   onPress, touchState,
 }) {
   const { colors, fonts } = useTheme();
@@ -81,32 +81,32 @@ export default function NewsLinkCard({
       onTouchCancel={() => setPressed(false)}
       onTouchEnd={() => setPressed(false)}
       onTouchStart={() => setPressed(true)}
-      onPress={() => (onPress ? onPress() : Linking.openURL(link))}
+      onPress={() => (onPress ? onPress() : Linking.openURL(article.link))}
     >
       <NewsCardWrapper
         color={cardColor}
         height={height}
         width={width}
-        headline={title}
-        link={link}
+        headline={article.title}
+        link={article.link}
         publisher={publisher}
         publisherLink={publisherLink}
       >
         <Image
           style={styles.image}
-          source={imageLink && imageLink !== '' ? { uri: imageLink } : { uri: publisherImageLink }}
+          source={article.imagelink && article.imagelink !== '' ? { uri: article.imagelink } : { uri: publisherImageLink }}
         />
         <View style={styles.titleBox}>
           <Text style={styles.title}>
-            {title}
+            {article.title}
           </Text>
         </View>
         <View style={{ ...styles.publisherBox, flexDirection: 'row' }}>
-          {section
-              && section !== ''
+          {article.section
+              && article.section !== ''
               && (
               <Text style={{ ...styles.publisher, fontFamily: titleFont, paddingRight: 10 }}>
-                {`${section}\t|`}
+                {`${article.section}\t|`}
               </Text>
               )}
           <Text style={styles.publisher}>
@@ -116,17 +116,17 @@ export default function NewsLinkCard({
         <View style={{ padding: 5, width: '100%' }}>
           <View style={{ flexDirection: 'row', alignContent: 'space-beween' }}>
             <Text numberOfLines={1} style={styles.providence}>
-              {author}
+              {article.author}
             </Text>
             <Text numberOfLines={1} style={{ ...styles.providence, flex: 0 }}>
-              {dateFormat(date)}
+              {dateFormat(article.date)}
             </Text>
           </View>
           <Text
             numberOfLines={2}
             style={styles.description}
           >
-            {description}
+            {article.description}
           </Text>
         </View>
       </NewsCardWrapper>
@@ -136,16 +136,10 @@ export default function NewsLinkCard({
 NewsLinkCard.propTypes = {
   height: PropTypes.number.isRequired,
   width: PropTypes.number.isRequired,
-  title: PropTypes.string.isRequired,
-  link: PropTypes.string.isRequired,
-  date: PropTypes.instanceOf(Date).isRequired,
+  article: PropTypes.instanceOf(Article).isRequired,
   publisher: PropTypes.string.isRequired,
   publisherLink: PropTypes.string.isRequired,
   publisherImageLink: PropTypes.string,
-  description: PropTypes.string,
-  section: PropTypes.string,
-  author: PropTypes.string,
-  imageLink: PropTypes.string,
   onPress: PropTypes.func,
   touchState: PropTypes.exact({
     state: PropTypes.bool,
@@ -154,10 +148,6 @@ NewsLinkCard.propTypes = {
 };
 NewsLinkCard.defaultProps = {
   publisherImageLink: undefined,
-  description: undefined,
-  author: undefined,
-  imageLink: undefined,
-  section: undefined,
   onPress: undefined,
   touchState: undefined,
 };

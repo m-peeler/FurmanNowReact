@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import Page from '../utilities/Page';
 import Button from './Button';
 
-const renderFront = (sourceImage) => function (style) {
+const renderFront = (sourceImage) => function curriedFront(style) {
   return <Icon sourceImage={sourceImage} style={style} />;
 };
 
