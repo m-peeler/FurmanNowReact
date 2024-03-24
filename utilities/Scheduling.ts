@@ -111,6 +111,37 @@ export enum DaysOfWeek {
  
       return false;
     }
+
+    isClosingWithin(time : Date, minsWithin : number) : boolean {
+      const dayOfWeek = Schedule.getDOWFromDate(time);
+      if (dayOfWeek === null) return false;
+      const dayBeforeIndex = (Schedule.DAYORDER.indexOf(dayOfWeek) + 6) % 7;
+      const dayBefore = Schedule.DAYORDER[dayBeforeIndex];
+
+      for (const hourRange of this.sched[dayOfWeek]) {
+         if (hourRange.rangeIsOrdered()) {
+            if (hourRange.isInRange(time) && timesWithinMinutes(time, hourRange.end, minsWithin) ) {
+              return true;
+            }
+         } else {
+            if (timeCompare(hourRange.start, time) <= 0 && timesWithinMinutes(time, hourRange.end, minsWithin)) {
+              return true;
+            }
+         }
+      }
+
+      // Checks day before to see if there were any times that spilled over into today
+      for (const hourRange of this.sched[dayBefore]) {
+         if ( !hourRange.rangeIsOrdered() 
+               && timeCompare(time, hourRange.end) <= 0
+               && timesWithinMinutes(time, hourRange.end, minsWithin)) {
+            return true;
+         }
+      }
+
+      return false;
+    }
+
  
     dailySchedules(onlyToday = false) {
       let scheds = []
@@ -124,6 +155,33 @@ export enum DaysOfWeek {
       return scheds;
     } 
  }
+
+/*
+ * Checks if first is before second, and by no more than min minutes. 
+ * Date independed, i.e. 11:30 pm would be within 90 minutes of 1:00 am  
+ */
+function timesWithinMinutes(first : Date, second : Date, mins : number) : boolean {
+   const sub = timeSubtractionMinutes(second, first);
+   return sub >= 0 && sub < mins;
+}
+
+/*
+ * Returns first minus second in minutes. If first is before second, 
+ * assumes second is on the previous day; i.e. 1:00 am - 11:30 pm
+ * is 90 minutes.
+ */
+function timeSubtractionMinutes(first : Date, second : Date) : number {
+   if (timeCompare(first, second) > 0) {
+      const hours = first.getHours() - second.getHours();
+      const minutes = first.getMinutes() - second.getMinutes();
+      const seconds = first.getSeconds() - second.getSeconds();
+      return (60 * hours) + minutes + (seconds / 60); 
+   } else {
+     const hours = first.getHours() + 24 - second.getHours();
+     const minutes = first.getMinutes() - second.getMinutes();
+     const seconds = first.getSeconds() - second.getSeconds();
+     return (60 * hours) + minutes + (seconds / 60);
+   }}
  
  export class HourRange {
     start : Date

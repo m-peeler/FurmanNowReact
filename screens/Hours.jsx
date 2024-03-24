@@ -18,13 +18,15 @@ const buttonStyl = (colors, fonts) => (pressed) => StyleSheet.create({
       flex: 2,
       flexGrow: 1,
     },
-    openIndicator: (opened) => {
+    openIndicator: (message) => {
       let background;
       if (pressed) {
         background = colors.notificationText;
-      } else if (opened) {
+      } else if (message === 'OPEN') {
         background = colors.positive;
-      } else {
+      } else if (message === 'CLOSES SOON') {
+        background = colors.warning;
+      } else if (message === 'CLOSED') {
         background = colors.negative;
       }
       return {
@@ -171,7 +173,12 @@ HoursButton.propTypes = {
 function HoursTitleBar({ styles, name, information }) {
   const { fonts } = useTheme();
   const opened = information.schedule.isOpened(new Date(Date.now()));
-  const openedString = `${name} is currently ${opened ? 'opened' : 'closed'}.`;
+  const closing = information.schedule.isClosingWithin(new Date(Date.now()), 60);
+  let message = opened ? 'OPEN' : 'CLOSED';
+  message = closing ? 'CLOSES SOON' : message;
+  const stringMessage = opened ? 'opened' : 'closed';
+  const closingMessage = closing ? 'but is closing soon' : '';
+  const openedString = `${name} is currently ${stringMessage}${closingMessage}.`;
   return (
     <View
       accessible
@@ -187,10 +194,10 @@ function HoursTitleBar({ styles, name, information }) {
           style={{ padding: 3, justifyContent: 'center' }}
         >
           <Text style={{ color: styles.title.color, fontFamily: fonts.bold }}>
-            {opened ? 'OPEN' : 'CLOSED'}
+            {message}
           </Text>
         </View>
-        <View style={styles.openIndicator(opened)} />
+        <View style={styles.openIndicator(message)} />
       </View>
     </View>
   );

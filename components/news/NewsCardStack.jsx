@@ -43,7 +43,7 @@ export default function NewsCardStack({
           showLength: 3,
           stackInterval: cardHeight * 0.1,
           scaleInterval: 0.04,
-          rotateZDeg: 50,
+          rotateZDeg: 60,
           snapDirection: 'left',
         },
       }}

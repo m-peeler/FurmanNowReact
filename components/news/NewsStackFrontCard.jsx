@@ -7,8 +7,8 @@ import { Image } from 'expo-image';
 import PropTypes from 'prop-types';
 import { useTheme } from '@react-navigation/native';
 import NewsCardWrapper from './NewsCardWrapper';
-import ARROW from '../assets/icon/creatype-arrow.png';
-import { Article } from '../../utilities/ArticleFunctions';
+import ARROW from '../../assets/icon/creatype-arrow.png';
+import { Article } from '../../utilities/ArticleFunctions.ts';
 
 export default function NewsStackFrontCard({
   cardWidth, cardHeight, articles, publisher, onPress,
@@ -23,12 +23,66 @@ export default function NewsStackFrontCard({
   useEffect(() => {
     const interval = setInterval(() => {
       setFrontArticle(haveLinks[Math.floor(Math.random() * haveLinks.length)]);
-    }, 15000);
+    }, 5_000);
     return () => { clearInterval(interval); };
   }, [haveLinks]);
 
   const { colors, fonts } = useTheme();
   const [pressed, setPressed] = useState(false);
+  const textColor = pressed ? colors.notificationText : colors.text;
+  const backColor = pressed ? colors.notification : colors.card;
+  const styles = {
+    image: {
+      height: '100%',
+      width: '100%',
+      borderRadius: 10,
+    },
+    background: {
+      height: '100%',
+      width: '100%',
+      position: 'absolute',
+      justifyContent: 'flex-end',
+    },
+    descriptionBounding: {
+      margin: 10,
+      padding: 5,
+      borderRadius: 4,
+      backgroundColor: `${backColor}88`,
+    },
+    description: {
+      fontFamily: fonts.italic,
+      color: textColor,
+    },
+    titleBounding: {
+      width: '40%',
+      position: 'absolute',
+      left: 0,
+      borderTopLeftRadius: 10,
+      borderBottomRightRadius: 10,
+      backgroundColor: `${backColor}88`,
+    },
+    title: {
+      fontFamily: fonts.bold,
+      color: textColor,
+      fontSize: 18,
+      textAlign: 'center',
+      padding: 5,
+    },
+    explainer: {
+      fontFamily: fonts.regular,
+      color: textColor,
+      padding: 5,
+      textAlign: 'center',
+    },
+    arrow: {
+      transform: [{ rotate: '-90deg' }],
+      marginLeft: 60,
+      marginVertical: -20,
+      width: 30,
+      height: 100,
+      tintColor: textColor,
+    },
+  };
   return (
     <NewsCardWrapper
       height={cardHeight}
@@ -46,47 +100,27 @@ export default function NewsStackFrontCard({
         onTouchEnd={() => setPressed(false)}
       >
         <Image
-          style={{ height: '100%', width: '100%', borderRadius: 10 }}
+          style={styles.image}
           source={{ uri: frontArticle ? frontArticle.article.imagelink : '' }}
           transition={{ duration: 500, effect: 'cross-dissolve' }}
         />
-        <View style={{
-          height: '100%', width: '100%', position: 'absolute', justifyContent: 'flex-end',
-        }}
-        >
-          <View style={{
-            margin: 10, padding: 5, borderRadius: 4, backgroundColor: `${pressed ? colors.notification : colors.card}88`,
-          }}
-          >
-            <Text style={{
-              fontFamily: fonts.italic, color: pressed ? colors.notificationText : colors.text,
-            }}
-            >
+        <View style={styles.background}>
+          <View style={styles.descriptionBounding}>
+            <Text style={styles.description}>
               {`${frontArticle ? `"${frontArticle.article.title}", by ${frontArticle.article.author}` : ''}`}
             </Text>
           </View>
         </View>
-        <View style={{
-          width: '40%', position: 'absolute', left: 0, borderTopLeftRadius: 10, borderBottomRightRadius: 10, backgroundColor: pressed ? colors.notification : colors.card,
-        }}
-        >
-          <Text style={{
-            fontFamily: fonts.bold, color: colors.text, fontSize: 18, textAlign: 'center', padding: 5,
-          }}
-          >
+        <View style={styles.titleBounding}>
+          <Text style={styles.title}>
             {`There are new posts from ${publisher.name}!`}
           </Text>
-          <Text style={{
-            fontFamily: fonts.regular, color: colors.text, padding: 5, textAlign: 'center',
-          }}
-          >
-            Swipe to see more, or hold down to share.
+          <Text style={styles.explainer}>
+            Swipe to see more, click to jump to article, or hold down to share.
           </Text>
           <Image
             source={ARROW}
-            style={{
-              transform: [{ rotate: '-90deg' }], marginLeft: 60, marginVertical: -20, width: 30, height: 100, tintColor: colors.text,
-            }}
+            style={styles.arrow}
           />
         </View>
       </Pressable>

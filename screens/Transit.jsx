@@ -3,7 +3,7 @@ import { Platform, View } from 'react-native';
 import { parseDatetime } from '../utilities/DateTimeFunctions.ts';
 import FUNowMapView from '../components/CustomMapView';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
-import BusRoute from '../components/BusRoute';
+import BusRoute from '../components/transit/BusRoute';
 import BusMarker from '../components/transit/BusMarker';
 
 export default function Transit() {
@@ -94,7 +94,7 @@ export default function Transit() {
       >
         {pulledRoutes !== undefined
           && pulledRoutes.map(({
-            color, routePolyline, name, vehicleIndex, website, averageSpeed,
+            color, routePolyline, name, vehicleIndex, website, averageSpeed, averageStopSeconds,
           }) => (
             <BusRoute
               key={name}
@@ -103,6 +103,7 @@ export default function Transit() {
               color={color}
               route={routePolyline}
               averageSpeed={parseFloat(averageSpeed)}
+              averageStopSeconds={parseFloat(averageStopSeconds)}
               stops={liveStops ? liveStops.filter(({ lineID }) => lineID === vehicleIndex) : []}
             />
           ))}

@@ -26,6 +26,7 @@ const CommonTheme = {
     emergency: palette.furmanCompRed,
     emergencyText: palette.black,
     positive: palette.furmanCompGreen,
+    warning: palette.furmanCompYellow,
     negative: palette.furmanCompRed,
     notificationContrast: palette.black,
   },

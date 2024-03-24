@@ -82,7 +82,7 @@ export default function Parking() {
   }, [colorInd]);
   return (
     <View style={{ flex: 1 }}>
-      <FUNowMapView>
+      <FUNowMapView zoom={0.5}>
         {parkingLots
           && parkingLots.map((zone) => <Polygon key={zone.name} coordinates={zone.boundry} strokeColor="#ffffff" fillColor={zone.colors()[colorInd % zone.colors().length]} />)}
       </FUNowMapView>

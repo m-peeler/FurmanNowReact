@@ -44,7 +44,7 @@ export default function Dining() {
         }}
         data={data}
         renderItem={({ item }) => (
-          <DHMenuCard meal={item[0]} stationMenus={item[1]} />
+          <DHMenuCard key={item[0]} meal={item[0]} stationMenus={item[1]} />
         )}
         width={Dimensions.get('window').width}
         height={Dimensions.get('window').height}
@@ -99,14 +99,14 @@ function DHMenuCard({ meal, stationMenus }) {
         estimatedItemSize={150}
         data={stationMenus}
         renderItem={({ item: [station, entries] }) => (
-          <View>
+          <View key={station}>
             <View style={styles.stationBox}>
               <Text style={styles.station}>
                 {`${station}`}
               </Text>
             </View>
             { entries.map(({ itemName }) => (
-              <Text style={styles.foodItem}>
+              <Text key={itemName} style={styles.foodItem}>
                 {itemName}
               </Text>
             ))}
@@ -118,5 +118,16 @@ function DHMenuCard({ meal, stationMenus }) {
 }
 DHMenuCard.propTypes = {
   meal: PropTypes.string.isRequired,
-  stationMenus: PropTypes.arrayOf().isRequired,
+  stationMenus: PropTypes.arrayOf(
+    PropTypes.arrayOf(
+      PropTypes.oneOfType([
+        PropTypes.string.isRequired,
+        PropTypes.arrayOf(
+          PropTypes.shape({
+            itemName: PropTypes.string.isRequired,
+          }).isRequired,
+        ).isRequired,
+      ]).isRequired,
+    ).isRequired,
+  ).isRequired,
 };

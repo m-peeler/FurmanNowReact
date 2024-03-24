@@ -1,5 +1,5 @@
-import { parseDate, parseTime, dateCompare } from '../utilities/DateTimeFunctions.ts';
-import { HourRange } from '../utilities/Scheduling.ts';
+import { parseDate, parseTime } from '../utilities/DateTimeFunctions.ts';
+import { dateCompare, HourRange } from '../utilities/Scheduling.ts';
 import arrayPartition from '../utilities/ArrayFunctions';
 import useDataLoadFetchCache from './useDataLoadFetchCache';
 

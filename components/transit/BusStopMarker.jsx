@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import PropTypes from 'prop-types';
-import BUSSTOP from '../assets/icon/bus-stop-freepik.png';
+import BUSSTOP from '../../assets/icon/bus-stop-freepik.png';
 
 export default function BusStopMarker(props) {
   const {

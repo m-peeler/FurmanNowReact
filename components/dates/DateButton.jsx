@@ -59,14 +59,17 @@ export default function DateButton({
         </Text>
         <View style={{ flex: 2, flexDirection: 'row' }}>
           <View style={{ flexDirection: 'column' }}>
-            <Text style={{ fontFamily: fonts.regular }}>
+            <Text style={{ color: colors.text, fontFamily: fonts.regular }}>
               {timeRange.formatStartEnd()}
             </Text>
-            <Text style={{ flex: 1, fontFamily: fonts.italic }}>
+            <Text style={{ flex: 1, color: colors.text, fontFamily: fonts.italic }}>
               {`${term.trim()}`}
             </Text>
           </View>
-          <Text style={{ flex: 1, fontFamily: fonts.regular, textAlign: 'right' }}>
+          <Text style={{
+            flex: 1, color: colors.text, fontFamily: fonts.regular, textAlign: 'right',
+          }}
+          >
             {`${basicStringDate(date)}`}
           </Text>
         </View>

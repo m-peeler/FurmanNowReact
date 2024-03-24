@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Switch, Text, Dimensions,
+  Keyboard,
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import PropTypes from 'prop-types';
@@ -40,16 +41,38 @@ export default function Map() {
   const [buildings] = useDataLoadFetchCache(
     'https://cs.furman.edu/~csdaemon/FUNow/buildingGet.php',
     'DATA:Building-Map-Info-Cache',
-    (d) => d.results,
+    (d) => {
+      if (!d || !d.results) return undefined;
+      return d.results.map((
+        { latitude, longitude, ...rest },
+      ) => (
+        {
+          coordinate: {
+            latitude: parseFloat(latitude), longitude: parseFloat(longitude),
+          },
+          ...rest,
+        }));
+    },
   );
 
   const [displaying, setDisplaying] = useState();
+  // If we use useState here, the setTimeout will
+  // use a stale value when determining if an undefined
+  // state should erase the current one.
+  const recentlyChanged = useRef(false);
 
   const setQualifiedDisplaying = (set) => {
-    if (!set) setDisplaying(undefined);
-    else if (!displaying || !displaying.name || displaying.name !== set.name) {
+    if (!set) {
+      setTimeout(() => {
+        if (!recentlyChanged.current) setDisplaying(undefined);
+      }, 10);
+    } else if (!displaying || !displaying.name || displaying.name !== set.name) {
       setDisplaying(set);
+      recentlyChanged.current = true;
+      // eslint-disable-next-line no-return-assign
+      setTimeout(() => (recentlyChanged.current = false), 200);
     }
+    return undefined;
   };
 
   const [search, setSearch] = useState('');
@@ -58,23 +81,42 @@ export default function Map() {
     setSearch(newSearch);
   };
 
+  const displayingBuildings = buildings ? buildings.filter((building) => (
+    (building.name && building.name.toLowerCase().includes(search.toLowerCase()))
+      || (building.nickname && building.nickname.toLowerCase().includes(search.toLowerCase()))
+      || (building.description
+        && building.description.toLowerCase().includes(search.toLowerCase()))))
+    : undefined;
+
+  const mapRef = useRef();
+  useEffect(() => {
+    if (displayingBuildings && displayingBuildings.length === 1) {
+      Keyboard.dismiss();
+      mapRef.current.animateToRegion({
+        ...displayingBuildings[0].coordinate,
+        latitudeDelta: 0.0015,
+        longitudeDelta: 0.0015,
+      });
+      setQualifiedDisplaying(displayingBuildings[0]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayingBuildings]);
+
   return (
     <View style={{ flex: 1 }}>
-      <FUNowMapView onPress={() => { setQualifiedDisplaying(undefined); }}>
-        {buildings !== undefined
-        && buildings.filter((building) => (
-          (building.name && building.name.toLowerCase().includes(search.toLowerCase()))
-            || (building.nickname && building.nickname.toLowerCase().includes(search.toLowerCase()))
-            || (building.description
-              && building.description.toLowerCase().includes(search.toLowerCase()))
-        ))
+      <FUNowMapView
+        ref={mapRef}
+        onPress={() => {
+          setQualifiedDisplaying(undefined);
+          Keyboard.dismiss();
+        }}
+      >
+        {displayingBuildings !== undefined
+        && displayingBuildings
           .map((building) => (
             <BuildingMarker
               key={building.name}
-              coordinate={{
-                latitude: parseFloat(building.latitude),
-                longitude: parseFloat(building.longitude),
-              }}
+              coordinate={building.coordinate}
               name={building.name}
               locationText={building.location}
               category={building.category}
@@ -82,7 +124,7 @@ export default function Map() {
               nickname={building.nickname}
               buildingID={parseInt(building.buildingID, 10)}
               polyline={building.polyline}
-              onPress={() => setTimeout(() => { setQualifiedDisplaying(building); }, 5)}
+              onPress={() => setQualifiedDisplaying(building)}
             />
           ))}
         <SearchBar
@@ -96,12 +138,18 @@ export default function Map() {
             borderTopColor: 'transparent',
             borderBottomLeftRadius: 0,
             borderBottomRightRadius: 0,
+            alignSelf: 'center',
           }}
           inputContainerStyle={{
-            backgroundColor: 'transparent', borderWidth: 0, borderRadius: 0, borderTopRightRadius: 10,
+            backgroundColor: colors.background,
+            borderWidth: 0,
+            borderRadius: 10,
+            alignSelf: 'center',
+            alignContent: 'center',
           }}
+          searchIcon={false}
+          clear
           inputStyle={{ fontFamily: fonts.regular, padding: 10 }}
-          leftIcon={null}
         />
       </FUNowMapView>
       {displaying

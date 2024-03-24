@@ -69,6 +69,7 @@
     "eslint-plugin-react": "^7.34.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-native": "^4.1.0",
+    "jetifier": "^2.0.0",
     "prop-types": "^15.8.1",
     "typescript": "^5.3.3"
   },

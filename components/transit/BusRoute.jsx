@@ -3,24 +3,41 @@ import PropTypes from 'prop-types';
 import ModifiedPolyline from './ModifiedPolyline';
 import BusStopMarker from './BusStopMarker';
 
-function calculateETA(distAway, stopsAway, averageSpeed, updated) {
-  const minsUntil = 60 * (distAway / averageSpeed) + (0.3 * stopsAway);
+function calculateETA(distAway, stopsAway, averageSpeed, averageStopSeconds, updated) {
+  const minsUntil = 60 * (distAway / averageSpeed) + (averageStopSeconds * stopsAway) / 60;
   const timeOfArrival = updated.getTime() + (1000 * 60 * minsUntil);
   return new Date(timeOfArrival);
 }
 
-function writeETAString(eta, vehicleName) {
+function writeETAString(
+  vehicleName,
+  distAway,
+  stopsAway,
+  averageSpeed,
+  averageStopSeconds,
+  updated,
+) {
   const name = vehicleName ? vehicleName.trim() : 'vehicle';
+
+  if ((stopsAway === undefined || stopsAway === '')
+      || (distAway === undefined || distAway === '')) {
+    return `The ${name} doesn't seem to be running right now`;
+  } if (Date.now() - updated.getTime() > (3 * 1000 * 60)) {
+    return `The ${name} times are stale; check website to ensure accuracy.`;
+  }
+
+  const eta = calculateETA(distAway, stopsAway, averageSpeed, averageStopSeconds, updated);
   const arrivalString = `${((eta.getHours() - 1) % 12) + 1}:${eta.getMinutes() < 10 ? '0' : ''}${eta.getMinutes()} ${eta.getHours() >= 12 && eta.getHours() !== 24 ? 'pm' : 'am'}`;
   const timeTill = Math.floor((eta.getTime() - Date.now()) / (1000 * 60));
   let message = `The ${name} should arrive around ${arrivalString} (${timeTill} minutes from now).`;
-  if (timeTill < -0.5) { message = 'I think you missed the bus &#128556;'; }
+
   if (timeTill < 1) { message = `The ${name} is pulling up right now.`; }
+  if (timeTill < -0.5) { message = 'I think you missed the bus 😬'; }
   return message;
 }
 
 export default function BusRoute({
-  color, route, stops, website, vehicleName, averageSpeed,
+  color, route, stops, website, vehicleName, averageSpeed, averageStopSeconds,
 }) {
   const stopMarkers = stops && stops[0]
     ? stops.map(({
@@ -30,12 +47,14 @@ export default function BusRoute({
         key={name}
         title={name}
         color={color}
-        eta={(vehicleStopsUntil !== undefined && vehicleStopsUntil !== '') && (distFromVehicle !== undefined && vehicleStopsUntil !== '')
-          ? writeETAString(
-            calculateETA(vehicleStopsUntil, distFromVehicle, averageSpeed, updated),
-            vehicleName,
-          )
-          : `The ${vehicleName} doesn't seem to be running right now.`}
+        eta={writeETAString(
+          vehicleName,
+          distFromVehicle,
+          vehicleStopsUntil,
+          averageSpeed,
+          averageStopSeconds,
+          updated,
+        )}
         coordinate={coordinate}
         website={website}
         vehicleName={vehicleName}

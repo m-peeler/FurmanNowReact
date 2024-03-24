@@ -55,6 +55,18 @@ export default function NewsYoutubeCard(
         width: width - 2 * playerPadding,
       }}
       >
+        <Text style={{
+          fontFamily: fonts.italic,
+          fontSize: 20,
+          position: 'absolute',
+          top: height / 3,
+          textAlign: 'center',
+          width: '100%',
+          color: colors.text,
+        }}
+        >
+          Loading...
+        </Text>
         <YoutubePlayer
           width={width - (10 + (2 * playerPadding))}
           height={(width - (10 + (2 * playerPadding))) * (9 / 16)}
@@ -78,6 +90,7 @@ export default function NewsYoutubeCard(
               fontFamily: fonts.bold,
               fontSize: 20,
               color: colors.text,
+              width: '100%',
             }}
           >
             {article.title}

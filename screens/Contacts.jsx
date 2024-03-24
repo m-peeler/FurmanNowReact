@@ -103,7 +103,7 @@ const renderItem = (colors, fonts) => function renderCurried({
             break;
           case 'Share Contact':
             Share.share({
-              message: `${name}: ${number}`,
+              message: `${name}: ${formatPhoneNumber(number)}`,
             });
             break;
           default:
