@@ -38,12 +38,25 @@ export default function EventsDisplay({ name, events }) {
                   paddingTop: 5,
                   textAlign: 'center',
                   textAlignVertical: 'bottom',
-                  color: colors.black,
+                  color: colors.notificationContrast,
                   fontFamily: fonts.heading,
                 }}
                 >
                   {item}
                 </Text>
+                {item === 'Other Events'
+                  && (
+                  <Text style={{
+                    fontSize: 14,
+                    fontFamily: fonts.regular,
+                    color: colors.notificationContrast,
+                    textAlign: 'center',
+                  }}
+                  >
+                    {'Want your events to appear here? '
+                    + 'Upload them to syncDIN with visibility set to "public"!'}
+                  </Text>
+                  )}
               </View>
             );
           }

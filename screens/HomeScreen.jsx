@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView, View, StyleSheet, Text, Dimensions,
 } from 'react-native';
@@ -11,6 +11,7 @@ import HomeScreenNavButton from '../components/HomeScreenNavButton';
 import Button from '../components/Button';
 import Page from '../utilities/Page';
 import Weather from '../components/Weather';
+import CreditsTab from '../components/CreditsTab';
 
 function renderResponsiveLabel(text) {
   return function respLabCurried(style) {
@@ -19,13 +20,43 @@ function renderResponsiveLabel(text) {
   };
 }
 
+function creditButton(onPress, unpressedColor, pressedColor) {
+  return (
+    <Button
+      onPress={onPress}
+      styles={(pressed) => ({
+        button: {
+          borderRadius: 10,
+          height: 20,
+          width: 20,
+          backgroundColor: pressed ? pressedColor : unpressedColor,
+        },
+      })}
+    />
+  );
+}
+
 export default function HomeScreen(props) {
   const {
     route: { params: { pages } },
-    navigation: { navigate },
+    navigation,
   } = props;
+  const { navigate } = navigation;
 
   const { colors, fonts } = useTheme();
+
+  const [showInfobox, setShowInfobox] = useState(false);
+  useEffect(() => {
+    // Use `setOptions` to update the button that we previously specified
+    // Now the button includes an `onPress` handler to update the count
+    navigation.setOptions({
+      headerRight: () => creditButton(
+        () => setShowInfobox(!showInfobox),
+        colors.notification,
+        colors.card,
+      ),
+    });
+  }, [navigation, colors, showInfobox]);
 
   function buttonColor(pressed) {
     return pressed ? colors.notification : colors.card;
@@ -104,54 +135,61 @@ export default function HomeScreen(props) {
   });
 
   return (
-    <SafeAreaView>
-      <Weather height={weatherHeight} width="100%" />
-      <View style={{
-        height: buttonPanelHeight,
-        width: '100%',
-        position: 'absolute',
-        flex: 1,
-        top: weatherHeight + (buttonPanelHeight / ((buttonCols + 1) * 4)),
-      }}
-      >
-        <FlashList
-          extraData={colors}
-          estimatedItemSize={100}
-          scrollEnabled={false}
-          data={pages}
-          numColumns={buttonCols}
-          renderItem={
-            ({ item: page }) => (
-              <HomeScreenNavButton
-                styles={buttonStyles}
-                onPress={() => navigate(page.name)}
-                toPage={page}
-              />
-            )
-            }
-        />
-      </View>
-      <View style={{
-        position: 'absolute',
-        top: weatherHeight + buttonPanelHeight,
-        height: newsHeight,
-        width: '100%',
-      }}
-      >
-        <Button
-          accessibilityLabel="News Feed"
-          accessibilityHint="Press to travel to the news feed"
-          front={renderResponsiveLabel('NEWS FEED')}
-          frontResponsive
-          styles={newsStyles}
-          onPress={() => navigate('Feed')}
-        />
-      </View>
-    </SafeAreaView>
+    <View>
+      <SafeAreaView>
+        <Weather height={weatherHeight} width="100%" />
+        <View style={{
+          height: buttonPanelHeight,
+          width: '100%',
+          position: 'absolute',
+          flex: 1,
+          top: weatherHeight + (buttonPanelHeight / ((buttonCols + 1) * 4)),
+        }}
+        >
+          <FlashList
+            extraData={colors}
+            estimatedItemSize={100}
+            scrollEnabled={false}
+            data={pages}
+            numColumns={buttonCols}
+            renderItem={
+              ({ item: page }) => (
+                <HomeScreenNavButton
+                  styles={buttonStyles}
+                  onPress={() => navigate(page.name)}
+                  toPage={page}
+                />
+              )
+              }
+          />
+        </View>
+        <View style={{
+          position: 'absolute',
+          top: weatherHeight + buttonPanelHeight,
+          height: newsHeight,
+          width: '100%',
+        }}
+        >
+          <Button
+            accessibilityLabel="News Feed"
+            accessibilityHint="Press to travel to the news feed"
+            front={renderResponsiveLabel('NEWS FEED')}
+            frontResponsive
+            styles={newsStyles}
+            onPress={() => navigate('Feed')}
+          />
+        </View>
+      </SafeAreaView>
+      {showInfobox
+        && (
+          <CreditsTab />
+        )}
+    </View>
   );
 }
 HomeScreen.propTypes = {
   navigation: PropTypes.shape({
+    setOptions: PropTypes.func.isRequired,
     navigate: PropTypes.func.isRequired,
   }).isRequired,
   route: PropTypes.shape({

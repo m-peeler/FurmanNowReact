@@ -53,7 +53,6 @@ export default function BuildingMarker({
           accessibilityLabel={`${name} location marker.`}
           key={`${name} Marker`}
           coordinate={coordinate}
-          title={name}
           onSelect={onPress}
           onPress={onPress}
         />

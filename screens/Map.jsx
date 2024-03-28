@@ -2,13 +2,18 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Switch, Text, Dimensions,
   Keyboard,
+  Linking,
+  Share,
 } from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { useTheme } from '@react-navigation/native';
 import PropTypes from 'prop-types';
 import { SearchBar } from 'react-native-elements';
+import ContextMenu from 'react-native-context-menu-view';
 import FUNowMapView from '../components/CustomMapView';
 import useDataLoadFetchCache from '../hooks/useDataLoadFetchCache';
 import BuildingMarker from '../components/BuildingMarker';
+import Button from '../components/Button';
 
 function CustomSwitch({
   name, color, state, onValueChange,
@@ -35,6 +40,14 @@ CustomSwitch.propTypes = {
   state: PropTypes.bool.isRequired,
   onValueChange: PropTypes.func.isRequired,
 };
+
+function websiteButtonFront(name, style) {
+  return (
+    <Text style={style}>
+      {`Learn more on the ${name} website.`}
+    </Text>
+  );
+}
 
 export default function Map() {
   const { colors, fonts } = useTheme();
@@ -102,10 +115,68 @@ export default function Map() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [displayingBuildings]);
 
+  const styles = {
+    description: {
+      color: colors.text,
+      fontFamily: fonts.regular,
+      fontSize: 14,
+    },
+    descriptionBackground: {
+      position: 'absolute',
+      padding: 10,
+      width: Dimensions.get('window').width - 20,
+      bottom: 35,
+      right: 0,
+      margin: 10,
+      borderRadius: 16,
+      backgroundColor: colors.card,
+    },
+    descriptionTitle: {
+      color: colors.text,
+      fontFamily: fonts.bold,
+      fontSize: 24,
+    },
+    descriptionWithNickname: {
+      color: colors.text,
+      fontFamily: fonts.italic,
+      fontSize: 16,
+    },
+    searchContainer: {
+      backgroundColor: colors.card,
+      borderWidth: 0,
+      borderBottomColor: 'transparent',
+      borderTopColor: 'transparent',
+      borderBottomLeftRadius: 0,
+      borderBottomRightRadius: 0,
+      alignSelf: 'center',
+    },
+    searchInputContainer: {
+      backgroundColor: colors.background,
+      borderWidth: 0,
+      borderRadius: 10,
+      alignSelf: 'center',
+      alignContent: 'center',
+    },
+    websiteButton: (pressed) => ({
+      button: {
+        backgroundColor: pressed ? colors.card : colors.notification,
+        borderRadius: 8,
+        padding: 6,
+      },
+      front: {
+        color: pressed ? colors.text : colors.notificationText,
+        fontFamily: fonts.italic,
+        fontSize: 14,
+        textAlign: 'center',
+      },
+    }),
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <FUNowMapView
         ref={mapRef}
+        zoom={0.5}
         onPress={() => {
           setQualifiedDisplaying(undefined);
           Keyboard.dismiss();
@@ -131,22 +202,8 @@ export default function Map() {
           placeholder="Search..."
           onChangeText={updateSearch}
           value={search}
-          containerStyle={{
-            backgroundColor: colors.card,
-            borderWidth: 0,
-            borderBottomColor: 'transparent',
-            borderTopColor: 'transparent',
-            borderBottomLeftRadius: 0,
-            borderBottomRightRadius: 0,
-            alignSelf: 'center',
-          }}
-          inputContainerStyle={{
-            backgroundColor: colors.background,
-            borderWidth: 0,
-            borderRadius: 10,
-            alignSelf: 'center',
-            alignContent: 'center',
-          }}
+          containerStyle={styles.searchContainer}
+          inputContainerStyle={styles.searchInputContainer}
           searchIcon={false}
           clear
           inputStyle={{ fontFamily: fonts.regular, padding: 10 }}
@@ -154,35 +211,52 @@ export default function Map() {
       </FUNowMapView>
       {displaying
           && (
-          <View style={{
-            position: 'absolute',
-            padding: 10,
-            width: Dimensions.get('window').width - 20,
-            bottom: 35,
-            right: 0,
-            margin: 10,
-            borderRadius: 16,
-            backgroundColor: colors.card,
-          }}
-          >
-            <Text style={{
-              color: colors.text,
-              fontFamily: fonts.bold,
-              fontSize: 24,
-            }}
-            >
-              {displaying.name}
+          <View style={styles.descriptionBackground}>
+            <Text style={styles.descriptionTitle}>
+              {displaying.nickname ? displaying.nickname : displaying.name}
             </Text>
+            {displaying.nickname
+              && (
+              <Text style={styles.descriptionWithNickname}>
+                {displaying.name}
+              </Text>
+              )}
             {displaying.description
             && (
-            <Text style={{
-              color: colors.text,
-              fontFamily: fonts.regular,
-              fontSize: 14,
-            }}
-            >
+            <Text style={styles.description}>
               {displaying.description}
             </Text>
+            )}
+            {displaying.website
+            && (
+              <Animated.View
+                style={{ padding: 6 }}
+                entering={FadeIn.duration(200)}
+                exiting={FadeOut.duration(200)}
+              >
+                <ContextMenu
+                  actions={[
+                    { title: 'Share Website' },
+                  ]}
+                  onPress={({ nativeEvent: name }) => {
+                    if (name === 'Share Website') {
+                      Share.share({
+                        message: `Visit the ${displaying.nickname ? displaying.nickname : displaying.name} at ${displaying.website}.\n\nShared from the Furman Now! app.`,
+                      });
+                    }
+                  }}
+                >
+                  <Button
+                    frontResponsive
+                    onPress={() => Linking.openURL(displaying.website)}
+                    styles={styles.websiteButton}
+                    front={(style) => websiteButtonFront(
+                      displaying.nickname ? displaying.nickname : displaying.name,
+                      style,
+                    )}
+                  />
+                </ContextMenu>
+              </Animated.View>
             )}
           </View>
           )}

@@ -37,7 +37,7 @@ function writeETAString(
 }
 
 export default function BusRoute({
-  color, route, stops, website, vehicleName, averageSpeed, averageStopSeconds,
+  color, route, stops, website, vehicleName, averageSpeed, averageStopSeconds, onPress,
 }) {
   const stopMarkers = stops && stops[0]
     ? stops.map(({
@@ -69,6 +69,7 @@ export default function BusRoute({
       strokeColor={color}
       strokeWidth={9}
       lineJoin="round"
+      onPress={onPress}
     />,
     ...stopMarkers];
 }

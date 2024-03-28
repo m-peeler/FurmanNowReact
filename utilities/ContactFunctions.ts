@@ -13,11 +13,13 @@ export function formatPhoneNumber(phone : string) : string | undefined {
 
 export class Contact {
   name: string;
-  number: number;
+  number?: number;
+  email?: string;
   company?: string; 
-  constructor(name: string, number: number, company="Furman University") {
+  constructor(name: string, content: {email?: string, phone?: number}, company="Furman University") {
     this.name = name;
-    this.number = number;
+    this.number = content.phone;
+    this.email = content.email;
     this.company = company
   }
 }
@@ -26,19 +28,28 @@ class InsertableContact implements NativeContact.Contact {
   contactType: NativeContact.ContactTypes = NativeContact.ContactTypes.Person;
   name: string;
   firstName?: string | undefined;
-  phoneNumbers: NativeContact.PhoneNumber[];
+  phoneNumbers?: NativeContact.PhoneNumber[];
+  emails?: NativeContact.Email[];
   company: string;
 
   constructor(contact: Contact) {
     this.name = contact.name;
     this.firstName = contact.name;
-    this.phoneNumbers = [{
-      number: formatPhoneNumber(contact.number.toString()),
-      isPrimary: true,
-      digits: contact.number.toString(),
-      countryCode: 'US',
-      label: 'mobile',
-    }];
+    if (contact.number) {
+      this.phoneNumbers = [{
+        number: formatPhoneNumber(contact.number.toString()),
+        isPrimary: true,
+        digits: contact.number.toString(),
+        countryCode: 'US',
+        label: 'mobile',
+      }];
+    }
+    if (contact.email) {
+      this.emails = [{
+        email: contact.email,
+        label: 'work'
+      }]
+    }
     this.company = contact.company ? contact.company : "Furman University";
   }
 }

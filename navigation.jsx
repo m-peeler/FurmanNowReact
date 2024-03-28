@@ -9,9 +9,10 @@ import Events from './screens/Events';
 import Dates from './screens/Dates';
 import Athletics from './screens/Athletics';
 import Hours from './screens/Hours';
-import Health from './screens/Health';
+import Safety from './screens/Safety';
 import Map from './screens/Map';
 import Dining from './screens/Dining';
+import Links from './screens/Links';
 import Page from './utilities/Page';
 import SMARTPHONE from './assets/icon/icon-phone.png';
 import CLOCK from './assets/icon/icon-clock.png';
@@ -40,10 +41,10 @@ const pages = [
   [new Page(5, 'Events', { category: catHome, icon: EVENTS }), Events],
   [new Page(6, 'Map', { category: catHome, icon: MAP }), Map],
   [new Page(7, 'Transit', { category: catHome, icon: BUS }), Transit],
-  [new Page(8, 'Health', { category: catHome, icon: CADUCEUS }), Health],
+  [new Page(8, 'Safety', { category: catHome, icon: CADUCEUS }), Safety],
   [new Page(9, 'Dates', { category: catHome, icon: DATES }), Dates],
   [new Page(10, 'Parking', { category: catHome, icon: PARKING }), Parking],
-  [new Page(11, 'Links', { category: catHome, icon: LINK }), Blank],
+  [new Page(11, 'Links', { category: catHome, icon: LINK }), Links],
   [new Page(12, 'Benches', { category: catHome, icon: BENCH }), Blank],
 ];
 

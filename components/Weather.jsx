@@ -34,9 +34,15 @@ function TempDisplay({
 }) {
   const { colors, fonts } = useTheme();
   const transparentColor = `${colors.card}D0`;
-
-  return (
-    <View style={{
+  const styles = {
+    low: {
+      color: colors.text,
+      fontFamily: fonts.italic,
+      fontSize: 15,
+      alignSelf: 'flex-end',
+      paddingBottom: 8,
+    },
+    background: {
       paddingLeft: '15%',
       backgroundColor: transparentColor,
       position: 'absolute',
@@ -44,41 +50,36 @@ function TempDisplay({
       flexDirection: 'column',
       borderTopRightRadius: 8,
       borderBottomRightRadius: 8,
-    }}
-    >
-      <Text style={{
-        color: colors.text,
-        paddingTop: 5,
-        fontFamily: fonts.bold,
-        fontSize: 24,
-        paddingLeft: 5,
-      }}
-      >
+    },
+    temperature: {
+      color: colors.text,
+      paddingTop: 5,
+      fontFamily: fonts.bold,
+      fontSize: 24,
+      paddingLeft: 5,
+    },
+    high: {
+      color: colors.text,
+      fontFamily: fonts.italic,
+      fontSize: 18,
+      paddingBottom: 8,
+    },
+  };
+
+  return (
+    <View style={styles.background}>
+      <Text style={styles.temperature}>
         {`${current}°${units}`}
       </Text>
       <View style={{ flexDirection: 'row' }}>
-        <Text style={{
-          color: colors.text,
-          fontFamily: fonts.italic,
-          fontSize: 18,
-          paddingBottom: 8,
-        }}
-        >
+        <Text style={styles.high}>
           {`${high}°${units} / `}
         </Text>
-        <Text style={{
-          color: colors.text,
-          fontFamily: fonts.italic,
-          fontSize: 15,
-          alignSelf: 'flex-end',
-          paddingBottom: 8,
-        }}
-        >
+        <Text style={styles.low}>
           {`${low}°${units}`}
         </Text>
       </View>
     </View>
-
   );
 }
 TempDisplay.propTypes = {
